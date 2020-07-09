@@ -11,6 +11,7 @@ using MongoDB.Bson;
 using SharpCompress.Common;
 using MongoDB.Driver.Core.Clusters.ServerSelectors;
 using System.Security.Cryptography;
+using System.Security.Permissions;
 
 namespace RSACoreLib
 {
@@ -254,17 +255,39 @@ namespace RSACoreLib
             }
             return RSAHash.Status.HashNotFound;
         }
+
+        public Status UpdateMetadata()
+        {
+            RSAData oData = new RSAData();
+            return oData.UpdateMetadata(this.hash,
+                                        this.classification,
+                                        this.tags);
+        }
+
         public void AddPath(RSAPath pRSAPath)
         {
             RSAData oData = new RSAData();
             oData.AddPath(this.hash, pRSAPath);
         }
-
         public void AddHash()
         {
             RSAData oData = new RSAData();
-            oData.AddHash(this.ToBsonDocument().ToString());
+            //oData.AddHash(this.ToBsonDocument().ToString());
+            oData.AddHash(this);
             return;
+        }
+        public List<RSAHashAggregate> GetHashesForOrganizer()
+        {
+            RSAData oData = new RSAData();
+            return oData.GetHashesForOrganizer();
+        }
+
+        public Status UpdatePathStatus()
+        {
+            RSAData oData = new RSAData();
+            return oData.UpdatePathStatus(this.hash,
+                                          this.paths[0].filename,
+                                          this.paths[0].status);
         }
         // hashes
         // {
@@ -287,6 +310,12 @@ namespace RSACoreLib
         //      }
         //      insertDate,
         // }
+    }
+    public class RSAHashAggregate
+    {
+        public String _id { get; set; }
+        public String hash_id { get; set; }
+        public Int32 contagem { get; set; }
     }
     public class RSAData
     {
@@ -364,6 +393,7 @@ namespace RSACoreLib
                 _RSAHash.classification = mgReturn.GetValue("classification").ToString();
                 _RSAHash.friendlyname = mgReturn.GetValue("friendlyname").ToString();
                 _RSAHash.insertDate = Convert.ToDateTime(mgReturn.GetValue("insertDate").ToString());
+                _RSAHash.tags = mgReturn.GetValue("tags").IsBsonNull? "" : mgReturn.GetValue("tags").ToString();
                 //_RSAPaths = BsonDocument.Parse(mgReturn.GetValue("insertdate").ToString()).ToList()
                 foreach (var oItem in mgReturn.GetValue("paths").AsBsonArray)
                 {
@@ -371,7 +401,7 @@ namespace RSACoreLib
                     _RSAPath.filename = oItem["filename"].ToString();
                     _RSAPath.volume = oItem["volume"].ToString();
                     _RSAPath.insertDate = Convert.ToDateTime(oItem["insertDate"].ToString());
-                    //_RSAPath.status = oItem["status"].ToString();
+                    _RSAPath.status = (RSAPath.Status) Convert.ToInt32(oItem["status"]);
                     _RSAPaths.Add(_RSAPath);
 
                     //_RSAPaths.Add(oItem.);
@@ -384,7 +414,6 @@ namespace RSACoreLib
             }
             return _RSAHash;
         }
-
         internal void AddPath(String pHash, RSAPath pRSAPath)
         {
             BsonDocument _filter = new BsonDocument();
@@ -392,10 +421,78 @@ namespace RSACoreLib
             var update = Builders<BsonDocument>.Update.AddToSet("paths", pRSAPath);
             dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(_filter, update);
         }
-
-        internal void AddHash(String pRSAHash)
+        internal void AddHash(RSAHash pRSAHash)
         {
-            dbRSADupCheck.GetCollection<BsonDocument>("hashes").InsertOne(BsonDocument.Parse(pRSAHash));
+            dbRSADupCheck.GetCollection<BsonDocument>("hashes").InsertOne(BsonDocument.Parse(pRSAHash.ToBsonDocument().ToString()));
+        }
+        internal List<RSAHashAggregate> GetHashesForOrganizer()
+        {
+            List<RSAHashAggregate> _aggregate = new List<RSAHashAggregate>();
+            try
+            {
+                var filtro = dbRSADupCheck.GetCollection<BsonDocument>("hashes").Aggregate()
+                                          .Project(new BsonDocument{
+                                                                 {"_id", "$hash"},
+                                                                 new BsonDocument{{"hash_id", "$_id" }},
+                                                                 {"contagem", new BsonDocument("$size", "$paths")}
+                                                                   })
+                                          .Sort(new BsonDocument{
+                                                               {"contagem", -1}
+                                                                })
+                                          .Match(new BsonDocument{
+                                                                { "contagem", new BsonDocument("$gt", 0)}
+                                                                 });
+                var results = filtro.ToList();
+                foreach(var oItem in results.ToList())
+                {
+                    RSAHashAggregate _itemAggregate = new RSAHashAggregate();
+                    _itemAggregate._id = oItem.GetValue("_id").ToString();
+                    _itemAggregate.hash_id = oItem.GetValue("hash_id").ToString();
+                    _itemAggregate.contagem = Convert.ToInt32(oItem.GetValue("contagem"));
+                    _aggregate.Add(_itemAggregate);
+                }
+            }
+            catch (Exception oErr)
+            {
+                _aggregate = null;
+            }
+            return _aggregate;
+        }
+
+        internal RSAHash.Status UpdateMetadata(String pHash, String pClassification, String pTags)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
+            var up = Builders<BsonDocument>.Update.Set("classification", pClassification)
+                                                  .Set("tags", pTags);
+            try
+            {
+                dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up);
+            }
+            catch (Exception oErr)
+            {
+                return RSAHash.Status.HashNotFound;
+            }
+            return RSAHash.Status.HashUpdated;
+        }
+
+        internal RSAHash.Status UpdatePathStatus(String pHash, String pFilename, RSAPath.Status pStatus)
+        {
+            var upOption = new UpdateOptions();
+            var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
+            upOption.ArrayFilters = new List<ArrayFilterDefinition> {
+                new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("element.filename",
+                                 pFilename)) };
+            var up = Builders<BsonDocument>.Update.Set("paths.$[element].status", pStatus);
+            try
+            {
+                dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up, upOption);
+                return RSAHash.Status.HashUpdated;
+            }
+            catch (Exception oErr)
+            {
+                return RSAHash.Status.HashNotFound;
+            }
         }
     }
 }
