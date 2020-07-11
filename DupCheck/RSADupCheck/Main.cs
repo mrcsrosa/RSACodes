@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Configuration;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+//using System.Collections.Generic;
+//using System.ComponentModel;
+//using System.Data;
+//using System.Drawing;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using System.Threading;
-using System.Data.Sql;
+//using System.Threading;
+//using System.Data.Sql;
 using RSACoreLib;
 using System.Management;
-using System.Configuration;
-using MongoDB.Driver;
-using MongoDB.Bson;
-using System.Security.Cryptography.X509Certificates;
+//using MongoDB.Driver;
+//using MongoDB.Bson;
+//using System.Security.Cryptography.X509Certificates;
 
 namespace RSADupCheck
 {
@@ -61,10 +60,10 @@ namespace RSADupCheck
                 oRSACore.BaseFolder = "";
             }
             // caso contrario, ajusta como configurado
-            if (oRSACore.DbPort == null || oRSACore.DbPort == "")
+            if (oRSACore.DbAddress == null || oRSACore.DbAddress == "")
             {
                 oRSACore.HasConfigured = false;
-                oRSACore.DbPort = "";
+                oRSACore.DbAddress = "";
             }
             // caso contrario, ajusta como configurado
             if (oRSACore.DbPort == null || oRSACore.DbPort == "")

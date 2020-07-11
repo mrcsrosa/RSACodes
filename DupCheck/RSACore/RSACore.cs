@@ -94,6 +94,7 @@ namespace RSACoreLib
             }
             catch(Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 return false;
             }
 
@@ -104,10 +105,16 @@ namespace RSACoreLib
             IsConnected = true;
             return true;           
         }
+
+        public void SaveDataAboutException(Exception pErr)
+        {
+            return;
+        }
+
         public String CalcularHash(String pArquivo)
         {
             System.Security.Cryptography.SHA256 oSHA256 = System.Security.Cryptography.SHA256.Create();
-            String sHashSolved = "";
+            String sHashSolved;
             System.IO.FileStream oStream;
             try
             {
@@ -136,10 +143,11 @@ namespace RSACoreLib
                     return false;
                 }
             }
-            catch ( Exception oException)
+            catch ( Exception oErr)
             {
-                throw new Exception("Falha");
+                oRSACore.SaveDataAboutException(oErr);
             }
+            return false;
         }
         public String[] GetSubFolders(String[] pFolders)
         {
@@ -166,9 +174,9 @@ namespace RSACoreLib
                         }
                     }
                 }
-                catch(Exception oException)
+                catch(Exception oErr)
                 {
-
+                    oRSACore.SaveDataAboutException(oErr);
                 }
             }
             return _AllowedFolder.ToArray();
@@ -189,7 +197,7 @@ namespace RSACoreLib
         public Status GetVolume()
         {
             RSAVolume _this = null;
-            RSAData oData = new RSAData();
+            //RSAData oData = new RSAData();
             //_this = oData.GetVolumeBySerial(this.serial);
             if (_this != null)
             {
@@ -216,7 +224,10 @@ namespace RSACoreLib
         {
             New,
             Processed,
+            NotProcessing,
+            ForProcesssing,
             ForDeletion,
+            Recovered,
             Killed
         }
         public String volume { get; set; }
@@ -233,12 +244,20 @@ namespace RSACoreLib
             HashFound,
             HashUpdated
         }
+        public enum ProcessedStatus
+        {
+            NotProcessed,
+            MetaRevised,
+            Processed,
+            Commmited
+        }
         public String hash;
         public List<RSAPath> paths { get; set; }
         public String classification;
         public String friendlyname;
         public String tags;
         public DateTime insertDate;
+        public ProcessedStatus status;
         public Status GetRSAHash()
         {
             RSAHash _this;
@@ -251,6 +270,7 @@ namespace RSACoreLib
                 tags = _this.tags;
                 insertDate = _this.insertDate;
                 paths = _this.paths;
+                status = _this.status;
                 return RSAHash.Status.HashFound;
             }
             return RSAHash.Status.HashNotFound;
@@ -346,6 +366,7 @@ namespace RSACoreLib
             }
             catch (Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 return false;
             }
             return true;
@@ -371,6 +392,7 @@ namespace RSACoreLib
             }
             catch (Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 _RSAVolume = null;
             }
             return _RSAVolume;
@@ -394,7 +416,7 @@ namespace RSACoreLib
                 _RSAHash.friendlyname = mgReturn.GetValue("friendlyname").ToString();
                 _RSAHash.insertDate = Convert.ToDateTime(mgReturn.GetValue("insertDate").ToString());
                 _RSAHash.tags = mgReturn.GetValue("tags").IsBsonNull? "" : mgReturn.GetValue("tags").ToString();
-                //_RSAPaths = BsonDocument.Parse(mgReturn.GetValue("insertdate").ToString()).ToList()
+                _RSAHash.status = (RSAHash.ProcessedStatus) Convert.ToInt32(mgReturn.GetValue("status").ToString());
                 foreach (var oItem in mgReturn.GetValue("paths").AsBsonArray)
                 {
                     _RSAPath = new RSAPath();
@@ -410,6 +432,7 @@ namespace RSACoreLib
             }
             catch (Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 _RSAHash = null;
             }
             return _RSAHash;
@@ -454,6 +477,7 @@ namespace RSACoreLib
             }
             catch (Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 _aggregate = null;
             }
             return _aggregate;
@@ -470,6 +494,7 @@ namespace RSACoreLib
             }
             catch (Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 return RSAHash.Status.HashNotFound;
             }
             return RSAHash.Status.HashUpdated;
@@ -491,6 +516,7 @@ namespace RSACoreLib
             }
             catch (Exception oErr)
             {
+                oRSACore.SaveDataAboutException(oErr);
                 return RSAHash.Status.HashNotFound;
             }
         }

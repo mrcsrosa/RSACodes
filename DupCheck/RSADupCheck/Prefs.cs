@@ -19,7 +19,6 @@ namespace RSADupCheck
         private String _StructuredFolderTmp;
         private String _DuplicatedFolderTmp;
         private RSACore oRSACore;
-        private Boolean bHasChanged;
         public Prefs()
         {
             InitializeComponent();
@@ -64,7 +63,9 @@ namespace RSADupCheck
         {
             if (!String.IsNullOrEmpty(txBaseFolder.Text))
             {
-                if (!oRSACore.BaseFolder.Equals(txBaseFolder.Text))  //Aconfiguracao ativa e diferente da requisitada
+                if (!oRSACore.BaseFolder.Equals(txBaseFolder.Text) ||
+                    !oRSACore.DbAddress.Equals(txDbAdress.Text) ||
+                    !oRSACore.DbPort.Equals(txDbPort.Text))  //Aconfiguracao ativa e diferente da requisitada
                 {
                     // A pasta informada não existe
                     if (!Directory.Exists(txBaseFolder.Text)) // O local destino informado nao existe
@@ -225,7 +226,7 @@ namespace RSADupCheck
             }
             else
             {
-                oSettings.Add("DbAddress", oRSACore.DbAddress);
+                oSettings["DbAddress"].Value = oRSACore.DbAddress;
             }
 
 

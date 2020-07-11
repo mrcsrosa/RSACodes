@@ -34,6 +34,11 @@ namespace RSADupCheck
         }
         private void btHash_Click(object sender, EventArgs e)
         {
+            if (ckbFolders.CheckedItems.Count < 1)
+            {
+                MessageBox.Show("Não foi selecionada nenhuma pasta !!", "Atenção !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             RSAHash oRSAHash = new RSAHash();
             List<RSAPath> oRSAPaths = new List<RSAPath>();
             String _hashvalue_;
@@ -50,7 +55,7 @@ namespace RSADupCheck
                     {
                         String[] _SubDirs = oRSACore.GetSubFolders(Directory.GetDirectories(ckbFolders.CheckedItems[nFolderIndex].ToString(),
                                                                                             "*.*",
-                                                                                            SearchOption.TopDirectoryOnly));
+                                                                                            chkSubFolder.Checked?SearchOption.AllDirectories:SearchOption.TopDirectoryOnly));
                         oAllSubDirs.Add(ckbFolders.CheckedItems[nFolderIndex].ToString());
                         foreach (String pSubFolder in _SubDirs)
                         {
@@ -64,7 +69,7 @@ namespace RSADupCheck
                 }
                 catch (Exception oErr)
                 {
-
+                    oRSACore.SaveDataAboutException(oErr);
                 }
                 pBarSubFolders.Minimum = 0;
                 pBarSubFolders.Maximum = oAllSubDirs.Count;

@@ -31,6 +31,10 @@ namespace RSADupCheck
             //{ $sort: 
             //    { contagem: -1 } }
             //] )
+            dgFiles.Columns["filename"].Width = 315;
+            dgFiles.Columns["volume"].Width = 65;
+            dgFiles.Columns["status"].Width = 85;
+
             FillHashList();
             if (dgHashes.Rows.Count > 0)
             {
@@ -120,6 +124,26 @@ namespace RSADupCheck
         }
         private void dgFiles_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
+            if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForDeletion.ToString())
+            {
+                btCancelaImagem.Text = "Recuperar Imagem";
+            }
+            else
+            {
+                btCancelaImagem.Text = "Excluir Imagem";
+            }
+
+
+            if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForProcesssing.ToString())
+            {
+                btManterImagem.Text = "Reverter";
+            }
+            else
+            {
+                btManterImagem.Text = "Manter Imagem";
+            }
+
+            //panel1.Refresh();
             pBox.ImageLocation = dgFiles.Rows[e.RowIndex].Cells["filename"].Value.ToString();
             pBox.SizeMode = PictureBoxSizeMode.StretchImage;
         }
@@ -131,10 +155,10 @@ namespace RSADupCheck
             BitmapSource oSource = oJpeg.Frames[0];
             BitmapMetadata oMeta = new BitmapMetadata("jpg");
             Image oImagem = pBox.Image;
-            foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
-            {
-                String x = "";
-            }
+            //foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
+            //{
+            //    String x = "";
+            //}
             oImagem.RotateFlip(RotateFlipType.Rotate90FlipNone);
             pBox.Image = oImagem;
         }
@@ -146,13 +170,10 @@ namespace RSADupCheck
             BitmapSource oSource = oJpeg.Frames[0];
             BitmapMetadata oMeta = new BitmapMetadata("jpg");
             Image oImagem = pBox.Image;
-
-
-
-            foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
-            {
-                String x = "";
-            }
+            //foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
+            //{
+            //    String x = "";
+            //}
             oImagem.RotateFlip(RotateFlipType.Rotate90FlipX);
             pBox.Image = oImagem;
         }
@@ -164,6 +185,8 @@ namespace RSADupCheck
             txTags.Enabled = true;
             btMetaUpdate.Enabled = false;
             btCancelaImagem.Enabled = false;
+            btProcessarImagem.Enabled = false;
+            btManterImagem.Enabled = false;
             btMetaSave.Enabled = true;
             btMetaCancel.Enabled = true;
         }
@@ -174,6 +197,8 @@ namespace RSADupCheck
             btMetaCancel.Enabled = false;
             btCancelaImagem.Enabled = true;
             btMetaUpdate.Enabled = true;
+            btProcessarImagem.Enabled = true;
+            btManterImagem.Enabled = true;
             txClassification.Enabled = false;
             txTags.Enabled = false;
         }
@@ -202,6 +227,8 @@ namespace RSADupCheck
             btMetaCancel.Enabled = false;
             btCancelaImagem.Enabled = true;
             btMetaUpdate.Enabled = true;
+            btProcessarImagem.Enabled = true;
+            btManterImagem.Enabled = true;
             txClassification.Enabled = false;
             txTags.Enabled = false;
         }
@@ -211,12 +238,27 @@ namespace RSADupCheck
             RSAPath oRSAPath = new RSAPath();
             oRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
             oRSAPath.filename = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].Value.ToString();
-            oRSAPath.status = RSAPath.Status.ForDeletion;
+            if (dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForDeletion.ToString())
+            {
+                oRSAPath.status = RSAPath.Status.Recovered;
+            }
+            else
+            {
+                oRSAPath.status = RSAPath.Status.ForDeletion;
+            }
             oRSAHash.paths = new List<RSAPath>();
             oRSAHash.paths.Add(oRSAPath);
             if ( oRSAHash.UpdatePathStatus() == RSAHash.Status.HashUpdated)
             {
                 dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value = oRSAPath.status;
+                if (oRSAPath.status == RSAPath.Status.ForDeletion)
+                {
+                    btCancelaImagem.Text = "Recuperar Imagem";
+                }
+                else
+                {
+                    btCancelaImagem.Text = "Excluir Imagem";
+                }
             }
 
             //var upOption = new UpdateOptions();
@@ -234,6 +276,55 @@ namespace RSADupCheck
         private void btRetornar_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btManterImagem_Click(object sender, EventArgs e)
+        {
+            RSAHash oRSAHash = new RSAHash();
+            RSAPath oRSAPath = new RSAPath();
+            oRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
+            oRSAPath.filename = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].Value.ToString();
+            if (dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.NotProcessing.ToString())
+            {
+                oRSAPath.status = RSAPath.Status.ForProcesssing;
+            }
+            else
+            {
+                oRSAPath.status = RSAPath.Status.NotProcessing;
+            }
+            oRSAHash.paths = new List<RSAPath>();
+            oRSAHash.paths.Add(oRSAPath);
+            if (oRSAHash.UpdatePathStatus() == RSAHash.Status.HashUpdated)
+            {
+                dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value = oRSAPath.status;
+                if (oRSAPath.status == RSAPath.Status.NotProcessing)
+                {
+                    btManterImagem.Text = "Manter Imagem";
+                }
+                else
+                {
+                    btManterImagem.Text = "Reverter";
+                }
+            }
+        }
+
+        private void btProcessarImagem_Click(object sender, EventArgs e)
+        {
+            String x = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].ToString();
+            //DataGridViewRow
+            Int32 nNoDups = 0;
+            for (Int32 nCounter =0; nCounter < dgFiles.Rows.Count; nCounter++)
+            {
+                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals(RSAPath.Status.ForProcesssing.ToString())) nNoDups++;
+            }
+            if (nNoDups > 1)
+            {
+                MessageBox.Show("Não é possivel manter 2 arquivos na base principal, por favor revisar !!", "Atenção !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            for (Int32 nCounter = 0; nCounter < dgFiles.Rows.Count; nCounter++)
+            {
+                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals(RSAPath.Status.ForProcesssing.ToString())) nNoDups++;
+            }
         }
     }
 }

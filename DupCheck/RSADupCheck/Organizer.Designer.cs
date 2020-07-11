@@ -50,11 +50,13 @@
             this.label6 = new System.Windows.Forms.Label();
             this.txFriendlyName = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.btRetornar = new System.Windows.Forms.Button();
+            this.btManterImagem = new System.Windows.Forms.Button();
+            this.btProcessarImagem = new System.Windows.Forms.Button();
             this.filename = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.status = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.btRetornar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgHashes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgFiles)).BeginInit();
@@ -183,6 +185,8 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.btProcessarImagem);
+            this.panel1.Controls.Add(this.btManterImagem);
             this.panel1.Controls.Add(this.btMetaCancel);
             this.panel1.Controls.Add(this.btMetaSave);
             this.panel1.Controls.Add(this.dgFiles);
@@ -201,6 +205,7 @@
             // 
             // btMetaCancel
             // 
+            this.btMetaCancel.Enabled = false;
             this.btMetaCancel.Location = new System.Drawing.Point(327, 291);
             this.btMetaCancel.Name = "btMetaCancel";
             this.btMetaCancel.Size = new System.Drawing.Size(62, 23);
@@ -211,6 +216,7 @@
             // 
             // btMetaSave
             // 
+            this.btMetaSave.Enabled = false;
             this.btMetaSave.Location = new System.Drawing.Point(103, 291);
             this.btMetaSave.Name = "btMetaSave";
             this.btMetaSave.Size = new System.Drawing.Size(62, 23);
@@ -221,7 +227,7 @@
             // 
             // btCancelaImagem
             // 
-            this.btCancelaImagem.Location = new System.Drawing.Point(432, 170);
+            this.btCancelaImagem.Location = new System.Drawing.Point(432, 215);
             this.btCancelaImagem.Name = "btCancelaImagem";
             this.btCancelaImagem.Size = new System.Drawing.Size(83, 39);
             this.btCancelaImagem.TabIndex = 7;
@@ -296,27 +302,6 @@
             this.label5.TabIndex = 0;
             this.label5.Text = "Nome amigável";
             // 
-            // filename
-            // 
-            this.filename.HeaderText = "Arquivo";
-            this.filename.Name = "filename";
-            this.filename.ReadOnly = true;
-            this.filename.Width = 350;
-            // 
-            // volume
-            // 
-            this.volume.HeaderText = "Volume";
-            this.volume.Name = "volume";
-            this.volume.ReadOnly = true;
-            this.volume.Width = 65;
-            // 
-            // status
-            // 
-            this.status.HeaderText = "Status";
-            this.status.Name = "status";
-            this.status.ReadOnly = true;
-            this.status.Width = 50;
-            // 
             // panel2
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -340,6 +325,50 @@
             this.btRetornar.Text = "Retornar";
             this.btRetornar.UseVisualStyleBackColor = true;
             this.btRetornar.Click += new System.EventHandler(this.btRetornar_Click);
+            // 
+            // btManterImagem
+            // 
+            this.btManterImagem.Location = new System.Drawing.Point(432, 170);
+            this.btManterImagem.Name = "btManterImagem";
+            this.btManterImagem.Size = new System.Drawing.Size(83, 39);
+            this.btManterImagem.TabIndex = 10;
+            this.btManterImagem.Text = "Manter Imagem";
+            this.btManterImagem.UseVisualStyleBackColor = true;
+            this.btManterImagem.Click += new System.EventHandler(this.btManterImagem_Click);
+            // 
+            // btProcessarImagem
+            // 
+            this.btProcessarImagem.Location = new System.Drawing.Point(432, 260);
+            this.btProcessarImagem.Name = "btProcessarImagem";
+            this.btProcessarImagem.Size = new System.Drawing.Size(83, 39);
+            this.btProcessarImagem.TabIndex = 11;
+            this.btProcessarImagem.Text = "Processar";
+            this.btProcessarImagem.UseVisualStyleBackColor = true;
+            this.btProcessarImagem.Click += new System.EventHandler(this.btProcessarImagem_Click);
+            // 
+            // filename
+            // 
+            this.filename.HeaderText = "Arquivo";
+            this.filename.Name = "filename";
+            this.filename.ReadOnly = true;
+            this.filename.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.filename.Width = 350;
+            // 
+            // volume
+            // 
+            this.volume.HeaderText = "Volume";
+            this.volume.Name = "volume";
+            this.volume.ReadOnly = true;
+            this.volume.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.volume.Width = 65;
+            // 
+            // status
+            // 
+            this.status.HeaderText = "Status";
+            this.status.Name = "status";
+            this.status.ReadOnly = true;
+            this.status.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.status.Width = 50;
             // 
             // Organizer
             // 
@@ -390,10 +419,12 @@
         private System.Windows.Forms.Button btCancelaImagem;
         private System.Windows.Forms.Button btMetaCancel;
         private System.Windows.Forms.Button btMetaSave;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btRetornar;
+        private System.Windows.Forms.Button btProcessarImagem;
+        private System.Windows.Forms.Button btManterImagem;
         private System.Windows.Forms.DataGridViewTextBoxColumn filename;
         private System.Windows.Forms.DataGridViewTextBoxColumn volume;
         private System.Windows.Forms.DataGridViewTextBoxColumn status;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Button btRetornar;
     }
 }

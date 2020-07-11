@@ -103,7 +103,6 @@
             this.txDbAdress.Name = "txDbAdress";
             this.txDbAdress.Size = new System.Drawing.Size(283, 20);
             this.txDbAdress.TabIndex = 12;
-            this.txDbAdress.Text = "localhost";
             // 
             // label2
             // 

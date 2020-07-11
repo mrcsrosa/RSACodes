@@ -34,13 +34,10 @@ namespace RSADupCheck
             BitmapSource oSource = oJpeg.Frames[0];
             BitmapMetadata oMeta = new BitmapMetadata("jpg");
             Image oImagem = pBox.Image;
-
-
-
-            foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
-            {
-                String x = "";
-            }
+            //foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
+            //{
+            //    String x = "";
+            //}
             oImagem.RotateFlip(RotateFlipType.Rotate90FlipX);
             pBox.Image = oImagem;
             
