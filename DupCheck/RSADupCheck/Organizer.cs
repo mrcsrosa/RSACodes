@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.ComponentModel;
-//using System.Data;
 using System.Drawing;
 using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
 using System.Windows.Forms;
 using RSACoreLib;
-//using MongoDB.Driver;
-//using MongoDB.Bson;
 using System.Windows.Media.Imaging;
-//using System.Security.Cryptography;
 
 namespace RSADupCheck
 {
@@ -61,31 +54,6 @@ namespace RSADupCheck
                 }
             }
             return;
-            //var files = oRSACore.Hashes.Find(new BsonDocument("hash", results[0].GetValue("_id").ToString()));
-            //var files = oRSACore.RSAHashes.Find(new BsonDocument("hash", pHash));
-            //txFriendlyName.Text = files.Single()["friendlyname"].ToString();
-            //txClassification.Text = files.Single()["classification"].ToString();
-            //try
-            //{
-            //    txTags.Text = files.Single()["tags"].ToString();
-            //}
-            //catch (Exception oErr)
-            //{
-            //    txTags.Text = "";
-            //}
-            //dgFiles.Rows.Clear();
-            //foreach (var hash in files.ToList())
-            //{
-            //    String x = "";
-            //    foreach (var file in hash["paths"].AsBsonArray)
-            //    {
-            //        dgFiles.Rows.Add(file["filename"].ToString(),
-            //                         file["volume"].ToString(),
-            //                         file["status"].ToString()
-            //            );
-            //    }
-            //    x = "";
-            //}
         }
         private void FillHashList()
         {
@@ -98,22 +66,6 @@ namespace RSADupCheck
                                   oForOrganizer[nCount]._id.ToString(),
                                   oForOrganizer[nCount].contagem.ToString());
             }
-
-            //var filtro = oRSACore.RSAHashes.Aggregate().Project(new BsonDocument { 
-            //                                                    { "_id", "$hash" },
-            //                                                    new BsonDocument{ {"hash_id", "$_id" } },
-            //                                                    { "contagem", new BsonDocument("$size", "$paths") } })
-            //                                        .Sort(new BsonDocument { { "contagem", -1 } })
-            //                                        .Match(new BsonDocument { { "contagem", new BsonDocument("$gt", 0) } });
-            //var results = filtro.ToList();
-            ////.Match(new BsonDocument { { "$match", new BsonDocument("contagem", "$gt:1") } });   results[0].GetValue("_id").ToString()
-            ////            foreach ( var item in results.)results[0].GetValue("_id").ToString()
-            //for (Int32 nCount = 0; nCount < results.Count(); nCount++)
-            //{
-            //    dgHashes.Rows.Add(results[nCount].GetValue("hash_id").ToString(), results[nCount].GetValue("_id").ToString(), results[nCount].GetValue("contagem").ToString());
-            //}
-
-
         }
         private void dgHashes_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
@@ -132,8 +84,6 @@ namespace RSADupCheck
             {
                 btCancelaImagem.Text = "Excluir Imagem";
             }
-
-
             if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForProcesssing.ToString())
             {
                 btManterImagem.Text = "Reverter";
@@ -142,8 +92,6 @@ namespace RSADupCheck
             {
                 btManterImagem.Text = "Manter Imagem";
             }
-
-            //panel1.Refresh();
             pBox.ImageLocation = dgFiles.Rows[e.RowIndex].Cells["filename"].Value.ToString();
             pBox.SizeMode = PictureBoxSizeMode.StretchImage;
         }
@@ -151,14 +99,9 @@ namespace RSADupCheck
         {
             System.Windows.Media.Imaging.JpegBitmapDecoder oJpeg = new System.Windows.Media.Imaging.JpegBitmapDecoder(new Uri(pBox.ImageLocation.ToString(), false),
                     System.Windows.Media.Imaging.BitmapCreateOptions.PreservePixelFormat, System.Windows.Media.Imaging.BitmapCacheOption.OnLoad);
-
             BitmapSource oSource = oJpeg.Frames[0];
             BitmapMetadata oMeta = new BitmapMetadata("jpg");
             Image oImagem = pBox.Image;
-            //foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
-            //{
-            //    String x = "";
-            //}
             oImagem.RotateFlip(RotateFlipType.Rotate90FlipNone);
             pBox.Image = oImagem;
         }
@@ -166,14 +109,9 @@ namespace RSADupCheck
         {
             System.Windows.Media.Imaging.JpegBitmapDecoder oJpeg = new System.Windows.Media.Imaging.JpegBitmapDecoder(new Uri(pBox.ImageLocation.ToString(), false),
             System.Windows.Media.Imaging.BitmapCreateOptions.PreservePixelFormat, System.Windows.Media.Imaging.BitmapCacheOption.OnLoad);
-
             BitmapSource oSource = oJpeg.Frames[0];
             BitmapMetadata oMeta = new BitmapMetadata("jpg");
             Image oImagem = pBox.Image;
-            //foreach (System.Drawing.Imaging.PropertyItem oProperty in oImagem.PropertyItems)
-            //{
-            //    String x = "";
-            //}
             oImagem.RotateFlip(RotateFlipType.Rotate90FlipX);
             pBox.Image = oImagem;
         }
@@ -212,12 +150,6 @@ namespace RSADupCheck
             {
 
             }
-            //var filter = Builders<BsonDocument>.Filter.Eq("hash", dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString());
-            //var up = Builders<BsonDocument>.Update.Set("classification", txClassification.Text)
-            //                                      .Set("tags", txTags.Text);
-
-
-            //oRSACore.RSAHashes.UpdateOne(filter, up);
         }
         private void btMetaCancel_Click(object sender, EventArgs e)
         {
@@ -260,24 +192,11 @@ namespace RSADupCheck
                     btCancelaImagem.Text = "Excluir Imagem";
                 }
             }
-
-            //var upOption = new UpdateOptions();
-            //var filter = Builders<BsonDocument>.Filter.Eq("hash", dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString());
-            //upOption.ArrayFilters = new List<ArrayFilterDefinition> { 
-            //    new BsonDocumentArrayFilterDefinition<BsonDocument>(
-            //    new BsonDocument("element.filename", 
-            //                     dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].Value.ToString())) };
-            //var up = Builders<BsonDocument>.Update.Set("paths.$[element].status", "-");
-            //oRSACore.RSAHashes.UpdateOne(filter, up, upOption);
-
-            //dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value = "-";
-            ////dgFiles.Rows[dgFiles.CurrentCell.RowIndex]
         }
         private void btRetornar_Click(object sender, EventArgs e)
         {
             this.Close();
         }
-
         private void btManterImagem_Click(object sender, EventArgs e)
         {
             RSAHash oRSAHash = new RSAHash();
@@ -307,11 +226,9 @@ namespace RSADupCheck
                 }
             }
         }
-
         private void btProcessarImagem_Click(object sender, EventArgs e)
         {
             String x = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].ToString();
-            //DataGridViewRow
             Int32 nNoDups = 0;
             for (Int32 nCounter =0; nCounter < dgFiles.Rows.Count; nCounter++)
             {

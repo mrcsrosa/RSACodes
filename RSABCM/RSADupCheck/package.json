@@ -1,0 +1,9 @@
+{
+  "name": "rsadup-check",
+  "version": "0.0.0",
+  "description": "RSADupCheck",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  }
+}

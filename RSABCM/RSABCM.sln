@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSACoreLib", "RSACoreLib\RSACoreLib.csproj", "{67688F3E-0797-4986-A381-712B4BAD36AC}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RSADupCheck", "RSADupCheck\RSADupCheck.njsproj", "{2C3BAA8D-3FD4-4EAA-8FA0-212F1AC02440}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67688F3E-0797-4986-A381-712B4BAD36AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67688F3E-0797-4986-A381-712B4BAD36AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67688F3E-0797-4986-A381-712B4BAD36AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67688F3E-0797-4986-A381-712B4BAD36AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C3BAA8D-3FD4-4EAA-8FA0-212F1AC02440}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C3BAA8D-3FD4-4EAA-8FA0-212F1AC02440}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C3BAA8D-3FD4-4EAA-8FA0-212F1AC02440}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C3BAA8D-3FD4-4EAA-8FA0-212F1AC02440}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {95083183-0718-4A68-89A7-31EBEBC13FD5}
+	EndGlobalSection
+EndGlobal

@@ -86,7 +86,7 @@ namespace RSADupCheck
                         oRSAHash.hash = _hashvalue_;
                         if ( oRSAHash.GetRSAHash() == RSAHash.Status.HashNotFound)
                         {
-                            oRSAHash.classification = "geral";
+                            oRSAHash.classification = "none";
                             oRSAHash.friendlyname = Path.GetFileName(pFile);
                             oRSAHash.insertDate = DateTime.Now;
                             oRSAHash.paths = new List<RSAPath>();
