@@ -89,6 +89,7 @@ namespace RSADupCheck
                             oRSAHash.classification = "none";
                             oRSAHash.friendlyname = Path.GetFileName(pFile);
                             oRSAHash.insertDate = DateTime.Now;
+                            oRSAHash.status = RSAHash.ProcessedStatus.NotProcessed;
                             oRSAHash.paths = new List<RSAPath>();
                             RSAPath oRSAPath = new RSAPath();
                             oRSAPath.volume = _hashSerialVolume[cbLogicalDrives.SelectedIndex].ToString();
@@ -215,7 +216,31 @@ namespace RSADupCheck
                 if (Convert.ToInt32(oVolumes["DriveType"]) >= 2 && 
                     Convert.ToInt32(oVolumes["DriveType"]) <= 4)
                 {
-                    oRSAVolume.serial = oVolumes["VolumeSerialNumber"] == null ? "0000-0000" : oVolumes["VolumeSerialNumber"].ToString();
+                    String sRSASerialVolume = "";
+                    if (!File.Exists(sDrive + @".RSASystems\.RSASerialVolume.idx"))
+                    {
+                        if (!Directory.Exists(sDrive + @".RSASystems\"))
+                        {
+                            DirectoryInfo oDirInfo = Directory.CreateDirectory(sDrive + @".RSASystems\");
+                            oDirInfo.Attributes = FileAttributes.Hidden;                            
+                        }
+                        sRSASerialVolume = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).ToUpper();
+//                        FileInfo oSerialVolume = new FileInfo(sDrive + @".RSASystems\.RSASerialVolume.idx");
+//                        oSerialVolume.CreateText();
+//                        oSerialVolume.Attributes = FileAttributes.Hidden;
+//                        oSerialVolume = null;
+                        StreamWriter oSaveData = new StreamWriter(sDrive + @".RSASystems\.RSASerialVolume.idx");
+                        oSaveData.WriteLine(sRSASerialVolume);
+                        oSaveData.Close();
+                        oRSAVolume.serial = sRSASerialVolume.Trim();
+                    }
+                    else
+                    {
+                        StreamReader oReadData = new StreamReader(sDrive + @".RSASystems\.RSASerialVolume.idx");
+                        sRSASerialVolume = oReadData.ReadLine();
+                        oRSAVolume.serial = sRSASerialVolume.Trim();
+                    }
+//                    oRSAVolume.serial = oVolumes["VolumeSerialNumber"] == null ? "0000-0000" : oVolumes["VolumeSerialNumber"].ToString();
                     if (oRSAVolume.GetVolume() == RSAVolume.Status.SerialNotFound)
                     {
                         oRSAVolume.type = oVolumes["DriveType"].ToString();
@@ -223,7 +248,7 @@ namespace RSADupCheck
                         oRSAVolume.lastScanningDate = new DateTime();
                         oRSAVolume.AddVolume();
                     }
-                    nPosition = cbLogicalDrives.Items.Add(sDrive + " => " + oRSAVolume.serial);
+                    nPosition = cbLogicalDrives.Items.Add(sDrive); // + " => " + oRSAVolume.serial);
                     _hashSerialVolume.Add(nPosition, oRSAVolume.serial);
                 }
             }

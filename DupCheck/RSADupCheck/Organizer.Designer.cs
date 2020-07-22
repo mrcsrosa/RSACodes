@@ -38,8 +38,13 @@
             this._id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.contagem = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dgFiles = new System.Windows.Forms.DataGridView();
+            this.filename = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btRotateRight = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btProcessarImagem = new System.Windows.Forms.Button();
+            this.btManterImagem = new System.Windows.Forms.Button();
             this.btMetaCancel = new System.Windows.Forms.Button();
             this.btMetaSave = new System.Windows.Forms.Button();
             this.btCancelaImagem = new System.Windows.Forms.Button();
@@ -52,11 +57,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btRetornar = new System.Windows.Forms.Button();
-            this.btManterImagem = new System.Windows.Forms.Button();
-            this.btProcessarImagem = new System.Windows.Forms.Button();
-            this.filename = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.status = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txProcessStatus = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgHashes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgFiles)).BeginInit();
@@ -171,6 +173,30 @@
             this.dgFiles.TabIndex = 8;
             this.dgFiles.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgFiles_RowEnter);
             // 
+            // filename
+            // 
+            this.filename.HeaderText = "Arquivo";
+            this.filename.Name = "filename";
+            this.filename.ReadOnly = true;
+            this.filename.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.filename.Width = 350;
+            // 
+            // volume
+            // 
+            this.volume.HeaderText = "Volume";
+            this.volume.Name = "volume";
+            this.volume.ReadOnly = true;
+            this.volume.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.volume.Width = 65;
+            // 
+            // status
+            // 
+            this.status.HeaderText = "Status";
+            this.status.Name = "status";
+            this.status.ReadOnly = true;
+            this.status.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.status.Width = 50;
+            // 
             // btRotateRight
             // 
             this.btRotateRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -200,13 +226,33 @@
             this.panel1.Controls.Add(this.label5);
             this.panel1.Location = new System.Drawing.Point(12, 267);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(526, 324);
+            this.panel1.Size = new System.Drawing.Size(526, 348);
             this.panel1.TabIndex = 10;
+            // 
+            // btProcessarImagem
+            // 
+            this.btProcessarImagem.Location = new System.Drawing.Point(432, 260);
+            this.btProcessarImagem.Name = "btProcessarImagem";
+            this.btProcessarImagem.Size = new System.Drawing.Size(83, 39);
+            this.btProcessarImagem.TabIndex = 11;
+            this.btProcessarImagem.Text = "Processar";
+            this.btProcessarImagem.UseVisualStyleBackColor = true;
+            this.btProcessarImagem.Click += new System.EventHandler(this.btProcessarImagem_Click);
+            // 
+            // btManterImagem
+            // 
+            this.btManterImagem.Location = new System.Drawing.Point(432, 170);
+            this.btManterImagem.Name = "btManterImagem";
+            this.btManterImagem.Size = new System.Drawing.Size(83, 39);
+            this.btManterImagem.TabIndex = 10;
+            this.btManterImagem.Text = "Manter Imagem";
+            this.btManterImagem.UseVisualStyleBackColor = true;
+            this.btManterImagem.Click += new System.EventHandler(this.btManterImagem_Click);
             // 
             // btMetaCancel
             // 
             this.btMetaCancel.Enabled = false;
-            this.btMetaCancel.Location = new System.Drawing.Point(327, 291);
+            this.btMetaCancel.Location = new System.Drawing.Point(327, 305);
             this.btMetaCancel.Name = "btMetaCancel";
             this.btMetaCancel.Size = new System.Drawing.Size(62, 23);
             this.btMetaCancel.TabIndex = 9;
@@ -217,7 +263,7 @@
             // btMetaSave
             // 
             this.btMetaSave.Enabled = false;
-            this.btMetaSave.Location = new System.Drawing.Point(103, 291);
+            this.btMetaSave.Location = new System.Drawing.Point(103, 305);
             this.btMetaSave.Name = "btMetaSave";
             this.btMetaSave.Size = new System.Drawing.Size(62, 23);
             this.btMetaSave.TabIndex = 8;
@@ -326,55 +372,30 @@
             this.btRetornar.UseVisualStyleBackColor = true;
             this.btRetornar.Click += new System.EventHandler(this.btRetornar_Click);
             // 
-            // btManterImagem
+            // label4
             // 
-            this.btManterImagem.Location = new System.Drawing.Point(432, 170);
-            this.btManterImagem.Name = "btManterImagem";
-            this.btManterImagem.Size = new System.Drawing.Size(83, 39);
-            this.btManterImagem.TabIndex = 10;
-            this.btManterImagem.Text = "Manter Imagem";
-            this.btManterImagem.UseVisualStyleBackColor = true;
-            this.btManterImagem.Click += new System.EventHandler(this.btManterImagem_Click);
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(281, 630);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(43, 13);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "Status";
             // 
-            // btProcessarImagem
+            // txProcessStatus
             // 
-            this.btProcessarImagem.Location = new System.Drawing.Point(432, 260);
-            this.btProcessarImagem.Name = "btProcessarImagem";
-            this.btProcessarImagem.Size = new System.Drawing.Size(83, 39);
-            this.btProcessarImagem.TabIndex = 11;
-            this.btProcessarImagem.Text = "Processar";
-            this.btProcessarImagem.UseVisualStyleBackColor = true;
-            this.btProcessarImagem.Click += new System.EventHandler(this.btProcessarImagem_Click);
-            // 
-            // filename
-            // 
-            this.filename.HeaderText = "Arquivo";
-            this.filename.Name = "filename";
-            this.filename.ReadOnly = true;
-            this.filename.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.filename.Width = 350;
-            // 
-            // volume
-            // 
-            this.volume.HeaderText = "Volume";
-            this.volume.Name = "volume";
-            this.volume.ReadOnly = true;
-            this.volume.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.volume.Width = 65;
-            // 
-            // status
-            // 
-            this.status.HeaderText = "Status";
-            this.status.Name = "status";
-            this.status.ReadOnly = true;
-            this.status.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.status.Width = 50;
+            this.txProcessStatus.Location = new System.Drawing.Point(340, 630);
+            this.txProcessStatus.Name = "txProcessStatus";
+            this.txProcessStatus.Size = new System.Drawing.Size(198, 20);
+            this.txProcessStatus.TabIndex = 13;
             // 
             // Organizer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1114, 724);
+            this.Controls.Add(this.txProcessStatus);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.btRetornar);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
@@ -426,5 +447,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn filename;
         private System.Windows.Forms.DataGridViewTextBoxColumn volume;
         private System.Windows.Forms.DataGridViewTextBoxColumn status;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txProcessStatus;
     }
 }

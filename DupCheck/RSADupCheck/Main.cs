@@ -13,6 +13,7 @@ using System.IO;
 //using System.Data.Sql;
 using RSACoreLib;
 using System.Management;
+using System.Security.AccessControl;
 //using MongoDB.Driver;
 //using MongoDB.Bson;
 //using System.Security.Cryptography.X509Certificates;
@@ -47,6 +48,14 @@ namespace RSADupCheck
         }
         private void CheckSystem()
         {
+            //var _syspaths_ = Environment.GetEnvironmentVariables();
+            //String sRSAFolderTag = _syspaths_["PUBLIC"].ToString().ToUpper() + @"\.RSASystems\";
+            String sRSAFolderTag =  @"C:\.RSASystems\";
+            if (!Directory.Exists(sRSAFolderTag))
+            {
+                DirectoryInfo oDirInfo = Directory.CreateDirectory(sRSAFolderTag);
+                oDirInfo.Attributes = FileAttributes.Hidden;
+            }
             // Leitura do arquivo de configuracao do sistema, para tentar encontrar
             // parametro de configuracao ja existente
             oRSACore.BaseFolder = ConfigurationSettings.AppSettings.Get("BaseFolder");

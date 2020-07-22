@@ -186,8 +186,17 @@ namespace RSACoreLib
     {
         public enum Status
         {
-            SerialNotInformed,
             SerialNotFound,
+            ST0,
+            ST1,
+            ST2,
+            ST3,
+            ST4,
+            ST5,
+            ST6,
+            ST7,
+            ST8,
+            ST9,
             SerialFound
         }
         public String serial { get; set; }
@@ -197,8 +206,8 @@ namespace RSACoreLib
         public Status GetVolume()
         {
             RSAVolume _this = null;
-            //RSAData oData = new RSAData();
-            //_this = oData.GetVolumeBySerial(this.serial);
+            RSAData oData = new RSAData();
+            _this = oData.GetVolumeBySerial(this.serial);
             if (_this != null)
             {
                 serial = _this.serial;
@@ -223,12 +232,23 @@ namespace RSACoreLib
         public enum Status
         {
             New,
-            Processed,
-            NotProcessing,
+            NotProcessed,
             ForProcesssing,
             ForDeletion,
+            KillIt,
+            ST0,
+            ST1,
+            ST2,
+            ST3,
+            ST4,
+            ST5,
+            ST6,
+            ST7,
+            ST8,
+            ST9,
+            Killed,
             Recovered,
-            Killed
+            Processed
         }
         public String volume { get; set; }
         public String filename { get; set; }
@@ -241,6 +261,16 @@ namespace RSACoreLib
         {
             HashNotInformed,
             HashNotFound,
+            ST0,
+            ST1,
+            ST2,
+            ST3,
+            ST4,
+            ST5,
+            ST6,
+            ST7,
+            ST8,
+            ST9,
             HashFound,
             HashUpdated
         }
@@ -248,6 +278,16 @@ namespace RSACoreLib
         {
             NotProcessed,
             MetaRevised,
+            ST0,
+            ST1,
+            ST2,
+            ST3,
+            ST4,
+            ST5,
+            ST6,
+            ST7,
+            ST8,
+            ST9,
             Processed,
             Commmited
         }
@@ -276,7 +316,7 @@ namespace RSACoreLib
             return RSAHash.Status.HashNotFound;
         }
 
-        public Status UpdateMetadata()
+        public ProcessedStatus UpdateMetadata()
         {
             RSAData oData = new RSAData();
             return oData.UpdateMetadata(this.hash,
@@ -483,7 +523,7 @@ namespace RSACoreLib
             return _aggregate;
         }
 
-        internal RSAHash.Status UpdateMetadata(String pHash, String pClassification, String pTags)
+        internal RSAHash.ProcessedStatus UpdateMetadata(String pHash, String pClassification, String pTags)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
             var up = Builders<BsonDocument>.Update.Set("classification", pClassification)
@@ -495,9 +535,9 @@ namespace RSACoreLib
             catch (Exception oErr)
             {
                 oRSACore.SaveDataAboutException(oErr);
-                return RSAHash.Status.HashNotFound;
+                return RSAHash.ProcessedStatus.ST5;
             }
-            return RSAHash.Status.HashUpdated;
+            return RSAHash.ProcessedStatus.MetaRevised;
         }
 
         internal RSAHash.Status UpdatePathStatus(String pHash, String pFilename, RSAPath.Status pStatus)
