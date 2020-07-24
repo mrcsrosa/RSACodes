@@ -132,6 +132,7 @@
             this.dgHashes.MultiSelect = false;
             this.dgHashes.Name = "dgHashes";
             this.dgHashes.ReadOnly = true;
+            this.dgHashes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgHashes.Size = new System.Drawing.Size(526, 187);
             this.dgHashes.TabIndex = 6;
             this.dgHashes.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgHashes_RowEnter);
@@ -169,6 +170,7 @@
             this.dgFiles.MultiSelect = false;
             this.dgFiles.Name = "dgFiles";
             this.dgFiles.ReadOnly = true;
+            this.dgFiles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgFiles.Size = new System.Drawing.Size(512, 115);
             this.dgFiles.TabIndex = 8;
             this.dgFiles.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgFiles_RowEnter);
@@ -384,6 +386,7 @@
             // 
             // txProcessStatus
             // 
+            this.txProcessStatus.Enabled = false;
             this.txProcessStatus.Location = new System.Drawing.Point(340, 630);
             this.txProcessStatus.Name = "txProcessStatus";
             this.txProcessStatus.Size = new System.Drawing.Size(198, 20);

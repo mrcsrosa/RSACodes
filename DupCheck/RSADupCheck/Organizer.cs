@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using RSACoreLib;
 using System.Windows.Media.Imaging;
 using System.IO;
-
 namespace RSADupCheck
 {
     public partial class Organizer : Form
@@ -14,80 +13,65 @@ namespace RSADupCheck
         private RSACore oRSACore;
         private String _metaclassification_;
         private String _metatags_;
+        private RSAHash oCurrentRSAHash;
         public Organizer()
         {
             InitializeComponent();
             oRSACore = RSACore.GetInstance();
             oRSACore.Connect();
-            //db.hashes.aggregate( [ 
-            //{ $project: {  _id:"$hash", contagem:  {  $size:"$paths"  }} 
-            //}, 
-            //{ $sort: 
-            //    { contagem: -1 } }
-            //] )
+            oCurrentRSAHash = new RSAHash();
             dgFiles.Columns["filename"].Width = 315;
             dgFiles.Columns["volume"].Width = 65;
             dgFiles.Columns["status"].Width = 85;
             FillHashList();
-            if (dgHashes.Rows.Count > 0)
+            if (dgHashes.Rows.Count > 0) dgHashes.CurrentCell = dgHashes[0, 0];
+        }
+
+        private void SetButtonsState()
+        {
+            if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.NotProcessed)
             {
-                FillFileList(dgHashes.Rows[0].Cells["_id"].Value.ToString(), 0);
-                dgHashes.CurrentCell = dgHashes[0, 0];
+                btMetaUpdate.Enabled = true;
+                btManterImagem.Enabled = true;
+                btCancelaImagem.Enabled = true;
+                btProcessarImagem.Enabled = false;
+            }
+            else if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.Processed)
+            {
+                btMetaUpdate.Enabled = false;
+                btManterImagem.Enabled = false;
+                btCancelaImagem.Enabled = false;
+                btProcessarImagem.Enabled = false;
+            }
+            else if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.ProcessedPartial)
+            {
+                btMetaUpdate.Enabled = false;
+                btManterImagem.Enabled = false;
+                btCancelaImagem.Enabled = true;
+                btProcessarImagem.Enabled = true;
+            }
+            else
+            {
+                btMetaUpdate.Enabled = true;
+                btManterImagem.Enabled = true;
+                btCancelaImagem.Enabled = true;
+                btProcessarImagem.Enabled = true;
             }
         }
+
         private void FillFileList(String pHash, Int32 pPos)
         {
-            RSAHash oRSAHash = new RSAHash();
-            oRSAHash.hash = pHash;
-            if (oRSAHash.GetRSAHash() == RSAHash.Status.HashFound)
+            txFriendlyName.Text = oCurrentRSAHash.friendlyname;
+            txClassification.Text = oCurrentRSAHash.classification;
+            txTags.Text = oCurrentRSAHash.tags;
+            dgFiles.Rows.Clear();
+            foreach (RSAPath oPath in oCurrentRSAHash.paths)
             {
-                txFriendlyName.Text = oRSAHash.friendlyname;
-                txClassification.Text = oRSAHash.classification;
-                txTags.Text = oRSAHash.tags;
-                dgFiles.Rows.Clear();
-                foreach (RSAPath oPath in oRSAHash.paths)
-                {
-                    Int32 nPos = dgFiles.Rows.Add(oPath.filename.ToString(),
-                                                  oPath.volume.ToString(),
-                                                  oPath.status
-                            );
-                    if (oPath.status == RSAPath.Status.New || 
-                        oPath.status == RSAPath.Status.NotProcessed)
-                    {
-                        dgFiles.Rows[nPos].DefaultCellStyle.BackColor = Color.White;
-                    }
-                    else if (oPath.status == RSAPath.Status.ForProcesssing ||
-                             oPath.status == RSAPath.Status.Processed)
-                    {
-                        dgFiles.Rows[nPos].DefaultCellStyle.BackColor = Color.GreenYellow;
-                    }
-                    else if (oPath.status == RSAPath.Status.ForDeletion)
-                    {
-                        dgFiles.Rows[nPos].DefaultCellStyle.BackColor = Color.Gold;
-                    }
-                    else if (oPath.status == RSAPath.Status.KillIt ||
-                             oPath.status == RSAPath.Status.Killed )
-                    {
-                        dgFiles.Rows[nPos].DefaultCellStyle.BackColor = Color.Red;
-                    }
-                }
-                if ( oRSAHash.status == RSAHash.ProcessedStatus.NotProcessed)
-                {
-                    txProcessStatus.Text = "Não revisado";
-                    dgHashes.Rows[pPos].DefaultCellStyle.BackColor = Color.White;
-                }
-                else if (oRSAHash.status == RSAHash.ProcessedStatus.MetaRevised)
-                {
-                    txProcessStatus.Text = "Revisado";
-                    dgHashes.Rows[pPos].DefaultCellStyle.BackColor = Color.Gold;
-                }
-                else if (oRSAHash.status == RSAHash.ProcessedStatus.Processed)
-                {
-                    txProcessStatus.Text = "Processado";
-                    dgHashes.Rows[pPos].DefaultCellStyle.BackColor = Color.GreenYellow;
-                }
+                Int32 nPos = dgFiles.Rows.Add(oPath.filename.ToString(),
+                                                oPath.volume.ToString(),
+                                                oPath.status
+                        );
             }
-            return;
         }
         private void FillHashList()
         {
@@ -102,32 +86,68 @@ namespace RSADupCheck
             }
         }
         private void dgHashes_RowEnter(object sender, DataGridViewCellEventArgs e)
-        {
+        {            
             if (dgHashes.Rows.Count > 0)
             {
-                FillFileList(dgHashes.Rows[e.RowIndex].Cells["_id"].Value.ToString(), e.RowIndex);
+                oCurrentRSAHash.hash = dgHashes.Rows[e.RowIndex].Cells["_id"].Value.ToString();
+                RSAHash.ProcessedStatus oRetCod = oCurrentRSAHash.GetRSAHash();
+                FillFileList(oCurrentRSAHash.hash, e.RowIndex);
+                SetButtonsState();
+                RefreshStatusColor();
             }
         }
         private void dgFiles_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
-            if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForDeletion.ToString())
+            if (oCurrentRSAHash.status != RSAHash.ProcessedStatus.ProcessedPartial)
             {
-                btCancelaImagem.Text = "Recuperar Imagem";
+                if (e.RowIndex >= 0)
+                {
+                    if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() ==
+                        RSAPath.Status.ForDeletion.ToString())
+                    {
+                        btCancelaImagem.Text = "Recuperar Imagem";
+                    }
+                    else
+                    {
+                        btCancelaImagem.Text = "Excluir Imagem";
+                    }
+                    if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() ==
+                        RSAPath.Status.ForProcesssing.ToString())
+                    {
+                        btManterImagem.Text = "Reverter";
+                    }
+                    else
+                    {
+                        btManterImagem.Text = "Manter Imagem";
+                    }
+                    pBox.ImageLocation = dgFiles.Rows[e.RowIndex].Cells["filename"].Value.ToString();
+                    pBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                }
             }
             else
             {
-                btCancelaImagem.Text = "Excluir Imagem";
+                if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.KillIt.ToString() ||
+                    dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.Killed.ToString() ||
+                    dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.Processed.ToString())
+                {
+                    btCancelaImagem.Enabled = false;
+                    btCancelaImagem.Text = "Excluir Imagem";
+                }
+                else
+                {
+                    if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForDeletion.ToString())
+                    {
+                        btCancelaImagem.Text = "Recuperar Imagem";
+                    }
+                    else
+                    {
+                        btCancelaImagem.Text = "Excluir Imagem";
+                    }
+                    btCancelaImagem.Enabled = true;
+                }
+                pBox.ImageLocation = dgFiles.Rows[e.RowIndex].Cells["filename"].Value.ToString();
+                pBox.SizeMode = PictureBoxSizeMode.StretchImage;
             }
-            if (dgFiles.Rows[e.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForProcesssing.ToString())
-            {
-                btManterImagem.Text = "Reverter";
-            }
-            else
-            {
-                btManterImagem.Text = "Manter Imagem";
-            }
-            pBox.ImageLocation = dgFiles.Rows[e.RowIndex].Cells["filename"].Value.ToString();
-            pBox.SizeMode = PictureBoxSizeMode.StretchImage;
         }
         private void btRotateLeft_Click(object sender, EventArgs e)
         {
@@ -161,10 +181,12 @@ namespace RSADupCheck
             btManterImagem.Enabled = false;
             btMetaSave.Enabled = true;
             btMetaCancel.Enabled = true;
+            SetButtonsState();
         }
         private void btMetaSave_Click(object sender, EventArgs e)
         {
-            SaveMetaData();
+            SaveMetaData(txClassification.Text, txFriendlyName.Text, txTags.Text, RSAHash.ProcessedStatus.MetaRevised);
+            RefreshStatusColor();
             btMetaSave.Enabled = false;
             btMetaCancel.Enabled = false;
             btCancelaImagem.Enabled = true;
@@ -174,20 +196,73 @@ namespace RSADupCheck
             txClassification.Enabled = false;
             txTags.Enabled = false;
         }
-        private void SaveMetaData()
+        private void SaveMetaData(String pClassification, String pFriendlyName, String pTags, RSAHash.ProcessedStatus pStatus)
         {
-            RSAHash oRSAHash = new RSAHash();
-            oRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
-            oRSAHash.classification = txClassification.Text;
-            oRSAHash.tags = txTags.Text;
-            oRSAHash.
-            if (oRSAHash.UpdateMetadata() == RSAHash.ProcessedStatus.MetaRevised)
+            oCurrentRSAHash.classification = pClassification;
+            oCurrentRSAHash.friendlyname = pFriendlyName;
+            oCurrentRSAHash.tags = pTags;
+            oCurrentRSAHash.status = pStatus;
+            oCurrentRSAHash.UpdateMetadata();
+        }
+        private void RefreshStatusColor()
+        {
+            if (dgHashes.CurrentCell != null)
             {
-                txProcessStatus.Text = "Revisado";
-            }
-            else
-            {
-                txProcessStatus.Text = "Não revisado";
+                //oCurrentRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
+                //oCurrentRSAHash.GetRSAHash();
+                if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.MetaRevised)
+                {
+                    txProcessStatus.Text = "Revisado";
+                    txProcessStatus.BackColor = Color.Gold;
+                }
+                else if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.NotProcessed)
+                {
+                    txProcessStatus.Text = "Não revisado";
+                    txProcessStatus.BackColor = Color.White;
+                }
+                else if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.ProcessedPartial)
+                {
+                    txProcessStatus.Text = "Processado - Parcial";
+                    txProcessStatus.BackColor = Color.Aquamarine;
+                }
+                else if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.Processed)
+                {
+                    txProcessStatus.Text = "Processado";
+                    txProcessStatus.BackColor = Color.GreenYellow;
+                }
+                for (Int32 nCounter = 0; nCounter < dgFiles.RowCount; nCounter++)
+                {
+                    if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals
+                                                              (RSAPath.Status.ForProcesssing.ToString()))
+                    {
+                        dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.GreenYellow;
+                    }
+                    else if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals
+                                              (RSAPath.Status.ForDeletion.ToString()))
+                    {
+                        dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.Gold;
+                    }
+                    else if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals
+                                              (RSAPath.Status.KillIt.ToString()))
+                    {
+                        dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.Red;
+                    }
+                    else if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals
+                              (RSAPath.Status.New.ToString()))
+                    {
+                        dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.White;
+                    }
+                    else if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals
+                              (RSAPath.Status.NotProcessed.ToString()))
+                    {
+                        dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.Gold;
+                    }
+                    else if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals
+                                              (RSAPath.Status.Processed.ToString()))
+                    {
+                        dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.GreenYellow;
+                    }
+                }
             }
         }
         private void btMetaCancel_Click(object sender, EventArgs e)
@@ -209,7 +284,8 @@ namespace RSADupCheck
             RSAPath oRSAPath = new RSAPath();
             oRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
             oRSAPath.filename = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].Value.ToString();
-            if (dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value.ToString() == RSAPath.Status.ForDeletion.ToString())
+            if (dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value.ToString() == 
+                RSAPath.Status.ForDeletion.ToString())
             {
                 oRSAPath.status = RSAPath.Status.Recovered;
                 dgFiles.Rows[dgFiles.CurrentCell.RowIndex].DefaultCellStyle.BackColor = Color.White;
@@ -221,7 +297,7 @@ namespace RSADupCheck
             }
             oRSAHash.paths = new List<RSAPath>();
             oRSAHash.paths.Add(oRSAPath);
-            if ( oRSAHash.UpdatePathStatus() == RSAHash.Status.HashUpdated)
+            if ( oRSAHash.UpdatePathStatus() != RSAHash.ProcessedStatus.NotProcessed)
             {
                 dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value = oRSAPath.status;
                 if (oRSAPath.status == RSAPath.Status.ForDeletion)
@@ -233,6 +309,7 @@ namespace RSADupCheck
                     btCancelaImagem.Text = "Excluir Imagem";
                 }
             }
+            SetButtonsState();
         }
         private void btRetornar_Click(object sender, EventArgs e)
         {
@@ -245,6 +322,8 @@ namespace RSADupCheck
             oRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
             oRSAPath.filename = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].Value.ToString();
             if (dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value.ToString() == 
+                RSAPath.Status.New.ToString() ||
+                dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value.ToString() ==
                 RSAPath.Status.NotProcessed.ToString())
             {
                 oRSAPath.status = RSAPath.Status.ForProcesssing;
@@ -257,7 +336,7 @@ namespace RSADupCheck
             }
             oRSAHash.paths = new List<RSAPath>();
             oRSAHash.paths.Add(oRSAPath);
-            if (oRSAHash.UpdatePathStatus() == RSAHash.Status.HashUpdated)
+            if (oRSAHash.UpdatePathStatus() != RSAHash.ProcessedStatus.NotProcessed)
             {
                 dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["status"].Value = oRSAPath.status;
                 if (oRSAPath.status == RSAPath.Status.NotProcessed)
@@ -269,30 +348,42 @@ namespace RSADupCheck
                     btManterImagem.Text = "Reverter";
                 }
             }
+            SetButtonsState();
         }
         private void btProcessarImagem_Click(object sender, EventArgs e)
         {
             RSAHash oRSAHash = new RSAHash();
             RSAPath oRSAPath = new RSAPath();
-            oRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
-            String x = dgFiles.Rows[dgFiles.CurrentCell.RowIndex].Cells["filename"].ToString();
-            Int32 nNoDups = 0;
+            oRSAHash.hash = oCurrentRSAHash.hash;
+            Int32 nForProcess = 0;
             for (Int32 nCounter =0; nCounter < dgFiles.Rows.Count; nCounter++)
             {
-                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals(RSAPath.Status.ForProcesssing.ToString())) nNoDups++;
+                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().
+                    Equals(RSAPath.Status.ForProcesssing.ToString())) nForProcess++;
             }
-            if (nNoDups > 1)
+            if (nForProcess > 1)
             {
                 MessageBox.Show("Não é possivel manter 2 arquivos na base principal, por favor revisar !!", "Atenção !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
             for (Int32 nCounter = 0; nCounter < dgFiles.Rows.Count; nCounter++)
             {
-                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().Equals(RSAPath.Status.ForDeletion.ToString()))
+                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().
+                    Equals(RSAPath.Status.New.ToString())  ||
+                    dgFiles.Rows[nCounter].Cells["status"].Value.ToString().
+                    Equals(RSAPath.Status.NotProcessed.ToString()) ||
+                    dgFiles.Rows[nCounter].Cells["status"].Value.ToString().
+                    Equals(RSAPath.Status.Recovered.ToString()))
                 {
-                    oRSAPath.filename = dgFiles.Rows[nCounter].Cells["filename"].Value.ToString();
-                    oRSAPath.status = RSAPath.Status.KillIt;
-                    oRSAHash.paths = new List<RSAPath>();
-                    oRSAHash.paths.Add(oRSAPath);
+                    MessageBox.Show("Existe imagem sem análise, por favor revisar !!", "Atenção !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            for (Int32 nCounter = 0; nCounter < dgFiles.Rows.Count; nCounter++)
+            {
+                if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().
+                    Equals(RSAPath.Status.ForDeletion.ToString()))
+                {
                     String sRandomFileName = DateTime.UtcNow.Year.ToString() +  // year
                                              DateTime.UtcNow.Month.ToString() +  // month
                                              DateTime.UtcNow.Day.ToString() +  // day 
@@ -305,21 +396,87 @@ namespace RSADupCheck
                     try
                     {
                         File.Move(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString(),
-                                  oRSACore.DuplicatedFolder + sRandomFileName +
+                                    oRSACore.DuplicatedFolder + sRandomFileName +
+                                                                Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString()));
+                    }
+                    catch (Exception oErr)
+                    {
+                        sRandomFileName = sRandomFileName + "_" + nCounter.ToString();
+                        File.Move(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString(),
+                                    oRSACore.DuplicatedFolder + sRandomFileName +
+                                                                Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString()));
+                    }
+
+                    oRSAPath.filename = dgFiles.Rows[nCounter].Cells["filename"].Value.ToString();
+
+                    oRSAPath.status = RSAPath.Status.KillIt;
+                    oRSAHash.paths = null;
+                    oRSAHash.paths = new List<RSAPath>();
+                    oRSAHash.paths.Add(oRSAPath);
+
+                    oRSAHash.UpdatePathStatus(oRSACore.DuplicatedFolder +
+                                                sRandomFileName +
+                                                Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString()));
+                    //dgFiles.Rows[nCounter].Cells["status"].Value = oRSAPath.status;
+                    //dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.Red;
+                }
+                else if (dgFiles.Rows[nCounter].Cells["status"].Value.ToString().
+                         Equals(RSAPath.Status.ForProcesssing.ToString()))
+                {
+                    String sRandomFileName = DateTime.UtcNow.Year.ToString() +  // year
+                                             DateTime.UtcNow.Month.ToString() +  // month
+                                             DateTime.UtcNow.Day.ToString() +  // day 
+                                             DateTime.UtcNow.Hour.ToString() +  // hour
+                                             DateTime.UtcNow.Minute.ToString() +  // minute
+                                             DateTime.UtcNow.Second.ToString() +  // second
+                                             DateTime.UtcNow.Second.ToString();
+
+                    // Copiar da origem para a pasta duplicated controlada pelo app
+                    try
+                    {
+                        if (!Directory.Exists(oRSACore.StructuredFolder + txClassification.Text))
+                        {
+                            Directory.CreateDirectory(oRSACore.StructuredFolder + txClassification.Text);
+                        }
+                        File.Move(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString(),
+                                  oRSACore.StructuredFolder + txClassification.Text + @"\" + sRandomFileName +
                                                               Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString()));
                     }
                     catch (Exception oErr)
                     {
                         sRandomFileName = sRandomFileName + "_" + nCounter.ToString();
                         File.Move(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString(),
-                                  oRSACore.DuplicatedFolder + sRandomFileName +
+                                  oRSACore.StructuredFolder + txClassification.Text + @"\" + sRandomFileName +
                                                               Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString()));
                     }
-                    oRSAHash.UpdatePathStatus();
-                    dgFiles.Rows[nCounter].Cells["status"].Value = oRSAPath.status;
-                    dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.Red;
+
+                    oRSAPath.filename = dgFiles.Rows[nCounter].Cells["filename"].Value.ToString();
+                    
+                    oRSAPath.status = RSAPath.Status.Processed;
+                    oRSAHash.paths = null;
+                    oRSAHash.paths = new List<RSAPath>();
+                    oRSAHash.paths.Add(oRSAPath);
+
+                    oRSAHash.UpdatePathStatus(oRSACore.StructuredFolder + 
+                                              txClassification.Text + @"\" + 
+                                              sRandomFileName +
+                                              Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString()));
+                    oRSAHash.friendlyname = sRandomFileName +
+                        Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString());
+                    txFriendlyName.Text = sRandomFileName +
+                        Path.GetExtension(dgFiles.Rows[nCounter].Cells["filename"].Value.ToString());
+                    oRSAHash.UpdateMetadata();
+
+                    //dgFiles.Rows[nCounter].Cells["status"].Value = oRSAPath.status;
+                    //dgFiles.Rows[nCounter].DefaultCellStyle.BackColor = Color.Red;
                 }
             }
+            SaveMetaData(txClassification.Text, txFriendlyName.Text, txTags.Text, RSAHash.ProcessedStatus.Processed);
+            oCurrentRSAHash.hash = dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString();
+            RSAHash.ProcessedStatus oRetCod = oCurrentRSAHash.GetRSAHash();
+            FillFileList(dgHashes.Rows[dgHashes.CurrentCell.RowIndex].Cells["_id"].Value.ToString(), dgHashes.CurrentCell.RowIndex);
+            RefreshStatusColor();
+            SetButtonsState();
         }
     }
 }

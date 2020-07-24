@@ -84,9 +84,9 @@ namespace RSADupCheck
                     {
                         _hashvalue_ = oRSACore.CalcularHash(pFile);
                         oRSAHash.hash = _hashvalue_;
-                        if ( oRSAHash.GetRSAHash() == RSAHash.Status.HashNotFound)
+                        if ( oRSAHash.GetRSAHash() == RSAHash.ProcessedStatus.NotFound)
                         {
-                            oRSAHash.classification = "none";
+                            oRSAHash.classification = "<<classificar>>";
                             oRSAHash.friendlyname = Path.GetFileName(pFile);
                             oRSAHash.insertDate = DateTime.Now;
                             oRSAHash.status = RSAHash.ProcessedStatus.NotProcessed;
@@ -110,6 +110,13 @@ namespace RSADupCheck
                                 oRSAPath.status = RSAPath.Status.New;
                                 oRSAHash.AddPath(oRSAPath);
                             }
+                            if (oRSAHash.status == RSAHash.ProcessedStatus.Processed ||
+                                oRSAHash.status == RSAHash.ProcessedStatus.Commmited)
+                            {
+                                oRSAHash.status = RSAHash.ProcessedStatus.ProcessedPartial;
+                                oRSAHash.UpdateMetadata();
+                            }
+
                         }
                         oFile.WriteLine(pFile);
                     }

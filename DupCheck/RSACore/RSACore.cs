@@ -76,6 +76,11 @@ namespace RSACoreLib
             //      insertDate,
             // }
         }
+
+        public RSAHash.ProcessedStatus RefreshRSAHash(string pRSAHash)
+        {
+            throw new NotImplementedException();
+        }
         public Boolean Connect()
         {
             //database.RunCommandAsync((Command<BsonDocument>)"{ping:1}").Wait(1000);
@@ -105,12 +110,10 @@ namespace RSACoreLib
             IsConnected = true;
             return true;           
         }
-
         public void SaveDataAboutException(Exception pErr)
         {
             return;
         }
-
         public String CalcularHash(String pArquivo)
         {
             System.Security.Cryptography.SHA256 oSHA256 = System.Security.Cryptography.SHA256.Create();
@@ -252,28 +255,12 @@ namespace RSACoreLib
         }
         public String volume { get; set; }
         public String filename { get; set; }
+        public String oldfilename { get; set; }
         public DateTime insertDate { get; set; }
         public Status status { get; set; }
     }
     public class RSAHash
     {
-        public enum Status
-        {
-            HashNotInformed,
-            HashNotFound,
-            ST0,
-            ST1,
-            ST2,
-            ST3,
-            ST4,
-            ST5,
-            ST6,
-            ST7,
-            ST8,
-            ST9,
-            HashFound,
-            HashUpdated
-        }
         public enum ProcessedStatus
         {
             NotProcessed,
@@ -282,12 +269,12 @@ namespace RSACoreLib
             ST1,
             ST2,
             ST3,
-            ST4,
-            ST5,
+            NotFound,
+            Fail,
             ST6,
             ST7,
             ST8,
-            ST9,
+            ProcessedPartial,
             Processed,
             Commmited
         }
@@ -298,7 +285,7 @@ namespace RSACoreLib
         public String tags;
         public DateTime insertDate;
         public ProcessedStatus status;
-        public Status GetRSAHash()
+        public ProcessedStatus GetRSAHash()
         {
             RSAHash _this;
             RSAData oData = new RSAData();
@@ -311,9 +298,9 @@ namespace RSACoreLib
                 insertDate = _this.insertDate;
                 paths = _this.paths;
                 status = _this.status;
-                return RSAHash.Status.HashFound;
+                return status;
             }
-            return RSAHash.Status.HashNotFound;
+            return RSAHash.ProcessedStatus.NotFound;
         }
 
         public ProcessedStatus UpdateMetadata()
@@ -321,7 +308,9 @@ namespace RSACoreLib
             RSAData oData = new RSAData();
             return oData.UpdateMetadata(this.hash,
                                         this.classification,
-                                        this.tags);
+                                        this.friendlyname,
+                                        this.tags,
+                                        this.status);
         }
 
         public void AddPath(RSAPath pRSAPath)
@@ -342,13 +331,22 @@ namespace RSACoreLib
             return oData.GetHashesForOrganizer();
         }
 
-        public Status UpdatePathStatus()
+        public ProcessedStatus UpdatePathStatus()
         {
             RSAData oData = new RSAData();
             return oData.UpdatePathStatus(this.hash,
                                           this.paths[0].filename,
                                           this.paths[0].status);
         }
+        public ProcessedStatus UpdatePathStatus(String pNewFileName)
+        {
+            RSAData oData = new RSAData();
+            return oData.UpdatePathStatus(this.hash,
+                                          this.paths[0].filename,
+                                          this.paths[0].status,
+                                          pNewFileName);
+        }
+
         // hashes
         // {
         //      hash,
@@ -376,6 +374,12 @@ namespace RSACoreLib
         public String _id { get; set; }
         public String hash_id { get; set; }
         public Int32 contagem { get; set; }
+        //db.hashes.aggregate( [ 
+        //{ $project: {  _id:"$hash", contagem:  {  $size:"$paths"  }} 
+        //}, 
+        //{ $sort: 
+        //    { contagem: -1 } }
+        //] )
     }
     public class RSAData
     {
@@ -523,11 +527,13 @@ namespace RSACoreLib
             return _aggregate;
         }
 
-        internal RSAHash.ProcessedStatus UpdateMetadata(String pHash, String pClassification, String pTags)
+        internal RSAHash.ProcessedStatus UpdateMetadata(String pHash, String pClassification, String pFriendlyName, String pTags, RSAHash.ProcessedStatus pStatus)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
             var up = Builders<BsonDocument>.Update.Set("classification", pClassification)
-                                                  .Set("tags", pTags);
+                                                  .Set("friendlyname", pFriendlyName)
+                                                  .Set("tags", pTags)
+                                                  .Set("status", pStatus );
             try
             {
                 dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up);
@@ -535,12 +541,12 @@ namespace RSACoreLib
             catch (Exception oErr)
             {
                 oRSACore.SaveDataAboutException(oErr);
-                return RSAHash.ProcessedStatus.ST5;
+                return RSAHash.ProcessedStatus.Fail;
             }
             return RSAHash.ProcessedStatus.MetaRevised;
         }
 
-        internal RSAHash.Status UpdatePathStatus(String pHash, String pFilename, RSAPath.Status pStatus)
+        internal RSAHash.ProcessedStatus UpdatePathStatus(String pHash, String pFilename, RSAPath.Status pStatus)
         {
             var upOption = new UpdateOptions();
             var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
@@ -551,14 +557,37 @@ namespace RSACoreLib
             var up = Builders<BsonDocument>.Update.Set("paths.$[element].status", pStatus);
             try
             {
-                dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up, upOption);
-                return RSAHash.Status.HashUpdated;
+                UpdateResult oRetCode =  dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up, upOption);
+                return RSAHash.ProcessedStatus.MetaRevised;
             }
             catch (Exception oErr)
             {
                 oRSACore.SaveDataAboutException(oErr);
-                return RSAHash.Status.HashNotFound;
+                return RSAHash.ProcessedStatus.NotProcessed;
             }
         }
+        internal RSAHash.ProcessedStatus UpdatePathStatus(String pHash, String pFilename, RSAPath.Status pStatus, String pNewFilename)
+        {
+            var upOption = new UpdateOptions();
+            var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
+            upOption.ArrayFilters = new List<ArrayFilterDefinition> {
+                new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("element.filename",
+                                 pFilename)) };
+            var up = Builders<BsonDocument>.Update.Set("paths.$[element].status", pStatus)
+                                                  .Set("paths.$[element].oldfilename", pFilename)
+                                                  .Set("paths.$[element].filename", pNewFilename);
+            try
+            {
+                UpdateResult oRetCode = dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up, upOption);
+                return RSAHash.ProcessedStatus.MetaRevised;
+            }
+            catch (Exception oErr)
+            {
+                oRSACore.SaveDataAboutException(oErr);
+                return RSAHash.ProcessedStatus.NotProcessed;
+            }
+        }
+
     }
 }
