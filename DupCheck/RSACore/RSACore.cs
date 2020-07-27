@@ -124,16 +124,14 @@ namespace RSACoreLib
                 oStream = System.IO.File.OpenRead(pArquivo);
                 sHashSolved = BitConverter.ToString(oSHA256.ComputeHash(oStream)).Replace("-", "").ToUpper();
             }
-            catch (Exception oExc)
+            catch (PathTooLongException oErr)
             {
-                throw oExc;
+                throw oErr;
             }
             return sHashSolved;
         }
         public Boolean HasSubFolders(String pFolder)
         {
-            //List<String> _AllowedFolder = new List<String>();
-            //_AllowedFolder.Add(pFolder);
             try
             {
                 String[] _Directories = Directory.GetDirectories(pFolder);
@@ -347,6 +345,20 @@ namespace RSACoreLib
                                           pNewFileName);
         }
 
+        public Boolean Delete()
+        {
+            RSAData oRSAData = new RSAData();
+            if (oRSAData.Delete(this.hash) > 0) return true;
+
+            return false;
+        }
+
+        public List<String> GetClassifications()
+        {
+            RSAData oRSAData = new RSAData();
+            return oRSAData.GetClassifications();
+        }
+
         // hashes
         // {
         //      hash,
@@ -526,7 +538,6 @@ namespace RSACoreLib
             }
             return _aggregate;
         }
-
         internal RSAHash.ProcessedStatus UpdateMetadata(String pHash, String pClassification, String pFriendlyName, String pTags, RSAHash.ProcessedStatus pStatus)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
@@ -545,7 +556,6 @@ namespace RSACoreLib
             }
             return RSAHash.ProcessedStatus.MetaRevised;
         }
-
         internal RSAHash.ProcessedStatus UpdatePathStatus(String pHash, String pFilename, RSAPath.Status pStatus)
         {
             var upOption = new UpdateOptions();
@@ -588,6 +598,27 @@ namespace RSACoreLib
                 return RSAHash.ProcessedStatus.NotProcessed;
             }
         }
+        internal Int32 Delete(string pHash)
+        {
+            var deleteFilter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
+            DeleteResult oRetCode =  dbRSADupCheck.GetCollection<BsonDocument>("hashes").DeleteOne(deleteFilter);
+            return (Int32) oRetCode.DeletedCount;
+        }
 
+        internal List<String> GetClassifications()
+        {
+            List<String> tmpList = new List<string>();
+            var results = dbRSADupCheck.GetCollection<BsonDocument>("hashes").
+                                                                   Aggregate().
+                                                                   Group("{_id: '$classification', total: {$sum: 1}}");
+
+            var meu = results.ToList();
+            foreach (var sClassification in meu.ToList())
+            {
+                tmpList.Add(sClassification.GetValue("_id").ToString()) ;
+            }
+
+            return tmpList;
+        }
     }
 }

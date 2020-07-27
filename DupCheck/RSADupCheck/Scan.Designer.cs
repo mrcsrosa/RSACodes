@@ -39,17 +39,19 @@
             this.label10 = new System.Windows.Forms.Label();
             this.btOut = new System.Windows.Forms.Button();
             this.pnlStatusProc = new System.Windows.Forms.Panel();
-            this.label11 = new System.Windows.Forms.Label();
-            this.pBarFolders = new System.Windows.Forms.ProgressBar();
-            this.pBarSubFolders = new System.Windows.Forms.ProgressBar();
-            this.lblNFolders = new System.Windows.Forms.Label();
-            this.lblNSubFolders = new System.Windows.Forms.Label();
-            this.lblNFIles = new System.Windows.Forms.Label();
-            this.lblFilesInProc = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
+            this.lbFilename = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.lblFilesInProc = new System.Windows.Forms.Label();
+            this.lblNFIles = new System.Windows.Forms.Label();
+            this.lblNSubFolders = new System.Windows.Forms.Label();
+            this.lblNFolders = new System.Windows.Forms.Label();
+            this.pBarSubFolders = new System.Windows.Forms.ProgressBar();
+            this.pBarFolders = new System.Windows.Forms.ProgressBar();
+            this.label11 = new System.Windows.Forms.Label();
             this.pnlScan = new System.Windows.Forms.Panel();
+            this.lblGira = new System.Windows.Forms.Label();
             this.pnlStatusProc.SuspendLayout();
             this.pnlScan.SuspendLayout();
             this.SuspendLayout();
@@ -152,6 +154,7 @@
             // 
             // pnlStatusProc
             // 
+            this.pnlStatusProc.Controls.Add(this.lbFilename);
             this.pnlStatusProc.Controls.Add(this.label12);
             this.pnlStatusProc.Controls.Add(this.label13);
             this.pnlStatusProc.Controls.Add(this.label14);
@@ -164,90 +167,19 @@
             this.pnlStatusProc.Controls.Add(this.label11);
             this.pnlStatusProc.Location = new System.Drawing.Point(17, 287);
             this.pnlStatusProc.Name = "pnlStatusProc";
-            this.pnlStatusProc.Size = new System.Drawing.Size(722, 124);
+            this.pnlStatusProc.Size = new System.Drawing.Size(722, 157);
             this.pnlStatusProc.TabIndex = 23;
             this.pnlStatusProc.Visible = false;
             // 
-            // label11
+            // lbFilename
             // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(250, 9);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(119, 17);
-            this.label11.TabIndex = 22;
-            this.label11.Text = "Processamento";
-            // 
-            // pBarFolders
-            // 
-            this.pBarFolders.Location = new System.Drawing.Point(105, 34);
-            this.pBarFolders.Name = "pBarFolders";
-            this.pBarFolders.Size = new System.Drawing.Size(520, 23);
-            this.pBarFolders.TabIndex = 3;
-            // 
-            // pBarSubFolders
-            // 
-            this.pBarSubFolders.Location = new System.Drawing.Point(105, 63);
-            this.pBarSubFolders.Name = "pBarSubFolders";
-            this.pBarSubFolders.Size = new System.Drawing.Size(520, 23);
-            this.pBarSubFolders.TabIndex = 26;
-            // 
-            // lblNFolders
-            // 
-            this.lblNFolders.AutoSize = true;
-            this.lblNFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNFolders.Location = new System.Drawing.Point(640, 34);
-            this.lblNFolders.Name = "lblNFolders";
-            this.lblNFolders.Size = new System.Drawing.Size(0, 17);
-            this.lblNFolders.TabIndex = 28;
-            // 
-            // lblNSubFolders
-            // 
-            this.lblNSubFolders.AutoSize = true;
-            this.lblNSubFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNSubFolders.Location = new System.Drawing.Point(640, 63);
-            this.lblNSubFolders.Name = "lblNSubFolders";
-            this.lblNSubFolders.Size = new System.Drawing.Size(0, 17);
-            this.lblNSubFolders.TabIndex = 29;
-            // 
-            // lblNFIles
-            // 
-            this.lblNFIles.AutoSize = true;
-            this.lblNFIles.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNFIles.Location = new System.Drawing.Point(640, 92);
-            this.lblNFIles.Name = "lblNFIles";
-            this.lblNFIles.Size = new System.Drawing.Size(0, 17);
-            this.lblNFIles.TabIndex = 30;
-            // 
-            // lblFilesInProc
-            // 
-            this.lblFilesInProc.AutoSize = true;
-            this.lblFilesInProc.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFilesInProc.ForeColor = System.Drawing.Color.DarkRed;
-            this.lblFilesInProc.Location = new System.Drawing.Point(328, 96);
-            this.lblFilesInProc.Name = "lblFilesInProc";
-            this.lblFilesInProc.Size = new System.Drawing.Size(0, 17);
-            this.lblFilesInProc.TabIndex = 31;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(3, 92);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(71, 17);
-            this.label14.TabIndex = 25;
-            this.label14.Text = "Arquivos";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(3, 63);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(84, 17);
-            this.label13.TabIndex = 24;
-            this.label13.Text = "Subpastas";
+            this.lbFilename.AutoSize = true;
+            this.lbFilename.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbFilename.ForeColor = System.Drawing.Color.Fuchsia;
+            this.lbFilename.Location = new System.Drawing.Point(104, 91);
+            this.lbFilename.Name = "lbFilename";
+            this.lbFilename.Size = new System.Drawing.Size(0, 18);
+            this.lbFilename.TabIndex = 32;
             // 
             // label12
             // 
@@ -259,9 +191,91 @@
             this.label12.TabIndex = 23;
             this.label12.Text = "Pastas";
             // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(3, 63);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(84, 17);
+            this.label13.TabIndex = 24;
+            this.label13.Text = "Subpastas";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.Location = new System.Drawing.Point(3, 92);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(71, 17);
+            this.label14.TabIndex = 25;
+            this.label14.Text = "Arquivos";
+            // 
+            // lblFilesInProc
+            // 
+            this.lblFilesInProc.AutoSize = true;
+            this.lblFilesInProc.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFilesInProc.ForeColor = System.Drawing.Color.DarkRed;
+            this.lblFilesInProc.Location = new System.Drawing.Point(333, 128);
+            this.lblFilesInProc.Name = "lblFilesInProc";
+            this.lblFilesInProc.Size = new System.Drawing.Size(0, 17);
+            this.lblFilesInProc.TabIndex = 31;
+            // 
+            // lblNFIles
+            // 
+            this.lblNFIles.AutoSize = true;
+            this.lblNFIles.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNFIles.Location = new System.Drawing.Point(640, 92);
+            this.lblNFIles.Name = "lblNFIles";
+            this.lblNFIles.Size = new System.Drawing.Size(0, 17);
+            this.lblNFIles.TabIndex = 30;
+            // 
+            // lblNSubFolders
+            // 
+            this.lblNSubFolders.AutoSize = true;
+            this.lblNSubFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNSubFolders.Location = new System.Drawing.Point(640, 63);
+            this.lblNSubFolders.Name = "lblNSubFolders";
+            this.lblNSubFolders.Size = new System.Drawing.Size(0, 17);
+            this.lblNSubFolders.TabIndex = 29;
+            // 
+            // lblNFolders
+            // 
+            this.lblNFolders.AutoSize = true;
+            this.lblNFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNFolders.Location = new System.Drawing.Point(640, 34);
+            this.lblNFolders.Name = "lblNFolders";
+            this.lblNFolders.Size = new System.Drawing.Size(0, 17);
+            this.lblNFolders.TabIndex = 28;
+            // 
+            // pBarSubFolders
+            // 
+            this.pBarSubFolders.Location = new System.Drawing.Point(105, 63);
+            this.pBarSubFolders.Name = "pBarSubFolders";
+            this.pBarSubFolders.Size = new System.Drawing.Size(520, 23);
+            this.pBarSubFolders.TabIndex = 26;
+            // 
+            // pBarFolders
+            // 
+            this.pBarFolders.Location = new System.Drawing.Point(105, 34);
+            this.pBarFolders.Name = "pBarFolders";
+            this.pBarFolders.Size = new System.Drawing.Size(520, 23);
+            this.pBarFolders.TabIndex = 3;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(250, 9);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(119, 17);
+            this.label11.TabIndex = 22;
+            this.label11.Text = "Processamento";
+            // 
             // pnlScan
             // 
             this.pnlScan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlScan.Controls.Add(this.lblGira);
             this.pnlScan.Controls.Add(this.pnlStatusProc);
             this.pnlScan.Controls.Add(this.btOut);
             this.pnlScan.Controls.Add(this.label10);
@@ -277,6 +291,16 @@
             this.pnlScan.Name = "pnlScan";
             this.pnlScan.Size = new System.Drawing.Size(746, 470);
             this.pnlScan.TabIndex = 15;
+            // 
+            // lblGira
+            // 
+            this.lblGira.AutoSize = true;
+            this.lblGira.Location = new System.Drawing.Point(660, 232);
+            this.lblGira.Name = "lblGira";
+            this.lblGira.Size = new System.Drawing.Size(9, 13);
+            this.lblGira.TabIndex = 25;
+            this.lblGira.Text = "|";
+            this.lblGira.Visible = false;
             // 
             // Scan
             // 
@@ -318,5 +342,7 @@
         private System.Windows.Forms.ProgressBar pBarFolders;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Panel pnlScan;
+        private System.Windows.Forms.Label lblGira;
+        private System.Windows.Forms.Label lbFilename;
     }
 }

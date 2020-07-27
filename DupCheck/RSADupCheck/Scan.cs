@@ -42,47 +42,100 @@ namespace RSADupCheck
             RSAHash oRSAHash = new RSAHash();
             List<RSAPath> oRSAPaths = new List<RSAPath>();
             String _hashvalue_;
-            oFile = new StreamWriter(@"D:\Saida.txt", true);
+            //oFile = new StreamWriter(@"D:\Saida.txt", true);
             pnlStatusProc.Visible = true;
             pBarFolders.Minimum = 0;
             pBarFolders.Maximum = ckbFolders.CheckedItems.Count;
-            List<String> oAllSubDirs = new List<String>();
+            pBarSubFolders.Minimum = 0;
+            pBarSubFolders.Maximum = 100;
+            lblGira.Text = @"|";
+            lblGira.Visible = true;
+            //List<String> oAllSubDirs = new List<String>();
             for (Int32 nFolderIndex = 0; nFolderIndex < ckbFolders.CheckedItems.Count; nFolderIndex++)
             {
+                //try
+                //{
+                //    //if (oRSACore.HasSubFolders(ckbFolders.CheckedItems[nFolderIndex].ToString()))
+                //    if (chkSubFolder.Checked)
+                //    {
+                //        String[] _SubDirs = oRSACore.GetSubFolders(Directory.GetDirectories(
+                //                                                   ckbFolders.CheckedItems[nFolderIndex].ToString(),
+                //                                                   "*.*",
+                //                                                   chkSubFolder.Checked?SearchOption.AllDirectories:SearchOption.TopDirectoryOnly));
+                //        oAllSubDirs.Add(ckbFolders.CheckedItems[nFolderIndex].ToString());
+                //        foreach (String pSubFolder in _SubDirs)
+                //        {
+                //            oAllSubDirs.Add(pSubFolder);
+                //            ItIsRunning();
+                //        }
+                //    }
+                //    else
+                //    {
+                //        oAllSubDirs.Add(ckbFolders.CheckedItems[nFolderIndex].ToString());
+                //    }
+                //}
+                //catch (Exception oErr)
+                //{
+                //    oRSACore.SaveDataAboutException(oErr);
+                //}
+
+                List<String> oAllSubDirs = new List<string>();
+                oAllSubDirs.Add(ckbFolders.CheckedItems[nFolderIndex].ToString());
+                String[] oSubDirs;
                 try
                 {
-                    if (oRSACore.HasSubFolders(ckbFolders.CheckedItems[nFolderIndex].ToString()))
-                    {
-                        String[] _SubDirs = oRSACore.GetSubFolders(Directory.GetDirectories(ckbFolders.CheckedItems[nFolderIndex].ToString(),
-                                                                                            "*.*",
-                                                                                            chkSubFolder.Checked?SearchOption.AllDirectories:SearchOption.TopDirectoryOnly));
-                        oAllSubDirs.Add(ckbFolders.CheckedItems[nFolderIndex].ToString());
-                        foreach (String pSubFolder in _SubDirs)
-                        {
-                            oAllSubDirs.Add(pSubFolder);
-                        }
-                    }
-                    else
-                    {
-                        oAllSubDirs.Add(ckbFolders.CheckedItems[nFolderIndex].ToString());
-                    }
+                    oSubDirs = Directory.GetDirectories(ckbFolders.CheckedItems[nFolderIndex].ToString(),
+                                                                    "*.*",
+                                                                    chkSubFolder.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
                 }
-                catch (Exception oErr)
+                catch (PathTooLongException oErr)
                 {
-                    oRSACore.SaveDataAboutException(oErr);
+                    pBarFolders.Increment(1);
+                    lblNFolders.Text = pBarFolders.Value.ToString();
+                    ItIsRunning();
+                    continue;
                 }
+                for (Int32 nCount = 0; nCount < oSubDirs.Length; nCount++)
+                {
+                    oAllSubDirs.Add(oSubDirs[nCount].ToString());
+                }
+                
                 pBarSubFolders.Minimum = 0;
                 pBarSubFolders.Maximum = oAllSubDirs.Count;
                 for (Int32 nSubDirsIndex = 0; nSubDirsIndex < oAllSubDirs.Count; nSubDirsIndex++)
                 {
                     lblFilesInProc.Text = "Localizando arquivos em subpasta ";
                     pnlStatusProc.Refresh();
-                    String[] pFiles = Directory.GetFiles(oAllSubDirs[nSubDirsIndex], txFileType.Text, SearchOption.TopDirectoryOnly);
+                    String[] pFiles;
+                    try
+                    {
+                        pFiles = Directory.GetFiles(oAllSubDirs[nSubDirsIndex],
+                                                             txFileType.Text,
+                                                             SearchOption.TopDirectoryOnly);
+                    }
+                    catch (PathTooLongException oErr)
+                    {
+                        pBarSubFolders.Increment(1);
+                        lblNSubFolders.Text = pBarSubFolders.Value.ToString();
+                        lblFilesInProc.Text = "";
+                        pnlStatusProc.Refresh();
+                        continue;
+                    }
                     lblFilesInProc.Text = "Processando " + pFiles.Length.ToString() + " arquivos";
                     pnlStatusProc.Refresh();
+                    lbFilename.Text = "";
                     foreach (String pFile in pFiles)
                     {
-                        _hashvalue_ = oRSACore.CalcularHash(pFile);
+                        lbFilename.Text = pFile;
+                        try
+                        {
+                            _hashvalue_ = oRSACore.CalcularHash(pFile);
+                        }
+                        catch (Exception oErr)
+                        {
+                            ItIsRunning();
+                            continue;
+                        }
                         oRSAHash.hash = _hashvalue_;
                         if ( oRSAHash.GetRSAHash() == RSAHash.ProcessedStatus.NotFound)
                         {
@@ -118,7 +171,8 @@ namespace RSADupCheck
                             }
 
                         }
-                        oFile.WriteLine(pFile);
+                        ItIsRunning();
+                        //oFile.WriteLine(pFile);
                     }
                     pBarSubFolders.Increment(1);
                     lblNSubFolders.Text = pBarSubFolders.Value.ToString();
@@ -127,8 +181,9 @@ namespace RSADupCheck
                 }
                 pBarFolders.Increment(1);
                 lblNFolders.Text = pBarFolders.Value.ToString();
+                ItIsRunning();
             }
-            oFile.Close();
+            //oFile.Close();
         }
         private void FillFolders(String pLogicalDrive)
         {
@@ -275,6 +330,22 @@ namespace RSADupCheck
         private void btOut_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+        private void ItIsRunning()
+        {
+            if (lblGira.Text == @"|")
+            {
+                lblGira.Text = @"/";
+            }
+            else if (lblGira.Text == @"/")
+            {
+                lblGira.Text = @"\";
+            }
+            else if (lblGira.Text == @"\")
+            {
+                lblGira.Text = @"|";
+            }
+            pnlScan.Refresh();
         }
     }
 }
