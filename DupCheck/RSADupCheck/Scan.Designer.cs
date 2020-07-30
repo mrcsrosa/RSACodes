@@ -50,10 +50,24 @@
             this.pBarSubFolders = new System.Windows.Forms.ProgressBar();
             this.pBarFolders = new System.Windows.Forms.ProgressBar();
             this.label11 = new System.Windows.Forms.Label();
-            this.pnlScan = new System.Windows.Forms.Panel();
+            this.pnlImportar = new System.Windows.Forms.Panel();
             this.lblGira = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btImportar = new System.Windows.Forms.Button();
+            this.cmbClassification = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.btFolderBrowsing = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txForImporting = new System.Windows.Forms.TextBox();
+            this.fldrBrowsing = new System.Windows.Forms.FolderBrowserDialog();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txFileTypeForImport = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txTagsForImport = new System.Windows.Forms.TextBox();
+            this.pbProcessamento = new System.Windows.Forms.ProgressBar();
             this.pnlStatusProc.SuspendLayout();
-            this.pnlScan.SuspendLayout();
+            this.pnlImportar.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btHash
@@ -167,7 +181,7 @@
             this.pnlStatusProc.Controls.Add(this.label11);
             this.pnlStatusProc.Location = new System.Drawing.Point(17, 287);
             this.pnlStatusProc.Name = "pnlStatusProc";
-            this.pnlStatusProc.Size = new System.Drawing.Size(722, 157);
+            this.pnlStatusProc.Size = new System.Drawing.Size(722, 124);
             this.pnlStatusProc.TabIndex = 23;
             this.pnlStatusProc.Visible = false;
             // 
@@ -272,25 +286,25 @@
             this.label11.TabIndex = 22;
             this.label11.Text = "Processamento";
             // 
-            // pnlScan
+            // pnlImportar
             // 
-            this.pnlScan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlScan.Controls.Add(this.lblGira);
-            this.pnlScan.Controls.Add(this.pnlStatusProc);
-            this.pnlScan.Controls.Add(this.btOut);
-            this.pnlScan.Controls.Add(this.label10);
-            this.pnlScan.Controls.Add(this.txFileType);
-            this.pnlScan.Controls.Add(this.label9);
-            this.pnlScan.Controls.Add(this.chkSubFolder);
-            this.pnlScan.Controls.Add(this.label8);
-            this.pnlScan.Controls.Add(this.ckbFolders);
-            this.pnlScan.Controls.Add(this.label7);
-            this.pnlScan.Controls.Add(this.cbLogicalDrives);
-            this.pnlScan.Controls.Add(this.btHash);
-            this.pnlScan.Location = new System.Drawing.Point(12, 12);
-            this.pnlScan.Name = "pnlScan";
-            this.pnlScan.Size = new System.Drawing.Size(746, 470);
-            this.pnlScan.TabIndex = 15;
+            this.pnlImportar.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlImportar.Controls.Add(this.lblGira);
+            this.pnlImportar.Controls.Add(this.pnlStatusProc);
+            this.pnlImportar.Controls.Add(this.btOut);
+            this.pnlImportar.Controls.Add(this.label10);
+            this.pnlImportar.Controls.Add(this.txFileType);
+            this.pnlImportar.Controls.Add(this.label9);
+            this.pnlImportar.Controls.Add(this.chkSubFolder);
+            this.pnlImportar.Controls.Add(this.label8);
+            this.pnlImportar.Controls.Add(this.ckbFolders);
+            this.pnlImportar.Controls.Add(this.label7);
+            this.pnlImportar.Controls.Add(this.cbLogicalDrives);
+            this.pnlImportar.Controls.Add(this.btHash);
+            this.pnlImportar.Location = new System.Drawing.Point(12, 221);
+            this.pnlImportar.Name = "pnlImportar";
+            this.pnlImportar.Size = new System.Drawing.Size(746, 422);
+            this.pnlImportar.TabIndex = 15;
             // 
             // lblGira
             // 
@@ -302,18 +316,147 @@
             this.lblGira.Text = "|";
             this.lblGira.Visible = false;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.pbProcessamento);
+            this.groupBox1.Controls.Add(this.txTagsForImport);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.txFileTypeForImport);
+            this.groupBox1.Controls.Add(this.btImportar);
+            this.groupBox1.Controls.Add(this.cmbClassification);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.btFolderBrowsing);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.txForImporting);
+            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(528, 203);
+            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Importar Pasta";
+            // 
+            // btImportar
+            // 
+            this.btImportar.Image = global::RSADupCheck.Properties.Resources.Database;
+            this.btImportar.Location = new System.Drawing.Point(9, 158);
+            this.btImportar.Name = "btImportar";
+            this.btImportar.Size = new System.Drawing.Size(79, 39);
+            this.btImportar.TabIndex = 15;
+            this.btImportar.UseVisualStyleBackColor = true;
+            this.btImportar.Click += new System.EventHandler(this.btImportar_Click);
+            // 
+            // cmbClassification
+            // 
+            this.cmbClassification.FormattingEnabled = true;
+            this.cmbClassification.Location = new System.Drawing.Point(146, 76);
+            this.cmbClassification.Name = "cmbClassification";
+            this.cmbClassification.Size = new System.Drawing.Size(369, 21);
+            this.cmbClassification.TabIndex = 14;
+            this.cmbClassification.Text = "<<classificar>>";
+            this.cmbClassification.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cmbClassification_KeyPress);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(6, 77);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(92, 15);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "Classificação";
+            // 
+            // btFolderBrowsing
+            // 
+            this.btFolderBrowsing.Image = global::RSADupCheck.Properties.Resources.Folder;
+            this.btFolderBrowsing.Location = new System.Drawing.Point(477, 19);
+            this.btFolderBrowsing.Name = "btFolderBrowsing";
+            this.btFolderBrowsing.Size = new System.Drawing.Size(38, 31);
+            this.btFolderBrowsing.TabIndex = 2;
+            this.btFolderBrowsing.UseVisualStyleBackColor = true;
+            this.btFolderBrowsing.Click += new System.EventHandler(this.btFolderBrowsing_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(6, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(134, 15);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Pasta para importar";
+            // 
+            // txForImporting
+            // 
+            this.txForImporting.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.txForImporting.Location = new System.Drawing.Point(146, 24);
+            this.txForImporting.Name = "txForImporting";
+            this.txForImporting.Size = new System.Drawing.Size(330, 20);
+            this.txForImporting.TabIndex = 0;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(6, 51);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(124, 15);
+            this.label2.TabIndex = 23;
+            this.label2.Text = "Padrao de arquivo";
+            // 
+            // txFileTypeForImport
+            // 
+            this.txFileTypeForImport.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.txFileTypeForImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txFileTypeForImport.Location = new System.Drawing.Point(146, 50);
+            this.txFileTypeForImport.Name = "txFileTypeForImport";
+            this.txFileTypeForImport.Size = new System.Drawing.Size(129, 20);
+            this.txFileTypeForImport.TabIndex = 22;
+            this.txFileTypeForImport.Text = "*.JPG";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(6, 103);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(38, 15);
+            this.label3.TabIndex = 24;
+            this.label3.Text = "Tags";
+            // 
+            // txTagsForImport
+            // 
+            this.txTagsForImport.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.txTagsForImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txTagsForImport.Location = new System.Drawing.Point(146, 103);
+            this.txTagsForImport.Multiline = true;
+            this.txTagsForImport.Name = "txTagsForImport";
+            this.txTagsForImport.Size = new System.Drawing.Size(369, 47);
+            this.txTagsForImport.TabIndex = 25;
+            // 
+            // pbProcessamento
+            // 
+            this.pbProcessamento.Location = new System.Drawing.Point(146, 162);
+            this.pbProcessamento.Name = "pbProcessamento";
+            this.pbProcessamento.Size = new System.Drawing.Size(369, 26);
+            this.pbProcessamento.TabIndex = 26;
+            this.pbProcessamento.Visible = false;
+            // 
             // Scan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(770, 494);
-            this.Controls.Add(this.pnlScan);
+            this.ClientSize = new System.Drawing.Size(1114, 659);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.pnlImportar);
             this.Name = "Scan";
             this.Text = "RSASoluções - Organizador de disco - Localizador de arquivos";
             this.pnlStatusProc.ResumeLayout(false);
             this.pnlStatusProc.PerformLayout();
-            this.pnlScan.ResumeLayout(false);
-            this.pnlScan.PerformLayout();
+            this.pnlImportar.ResumeLayout(false);
+            this.pnlImportar.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -341,8 +484,21 @@
         private System.Windows.Forms.ProgressBar pBarSubFolders;
         private System.Windows.Forms.ProgressBar pBarFolders;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Panel pnlScan;
+        private System.Windows.Forms.Panel pnlImportar;
         private System.Windows.Forms.Label lblGira;
         private System.Windows.Forms.Label lbFilename;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btFolderBrowsing;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txForImporting;
+        private System.Windows.Forms.FolderBrowserDialog fldrBrowsing;
+        private System.Windows.Forms.ComboBox cmbClassification;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button btImportar;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txFileTypeForImport;
+        private System.Windows.Forms.TextBox txTagsForImport;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ProgressBar pbProcessamento;
     }
 }

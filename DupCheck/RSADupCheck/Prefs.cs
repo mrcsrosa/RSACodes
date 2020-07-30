@@ -40,23 +40,19 @@ namespace RSADupCheck
         {
             if (!oRSACore.HasConfigured)
             {
-                DialogResult oDialog = MessageBox.Show(this, "Sistema não configurado, não é possivel continuar", "Alerta", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                DialogResult oDialog = MessageBox.Show(this, 
+                                                       "Sistema não configurado, não é possivel continuar",
+                                                       "Alerta",
+                                                       MessageBoxButtons.OK, 
+                                                       MessageBoxIcon.Warning);
                 if (oDialog == DialogResult.OK)
                 {
                     this.Close();
-                    //prefsItem.Enabled = true;
-                    //pnlPrefs.Visible = false;
                 }
             }
             else
             {
                 this.Close();
-                //bHasConfigured = true;
-                //pnlPrefs.Visible = false;
-                //scanItem.Enabled = true;
-                //organizeItem.Enabled = true;
-                //viewItem.Enabled = true;
-                //prefsItem.Enabled = true;
             }
         }
         private void btPrefsSave_Click(object sender, EventArgs e)
@@ -65,7 +61,7 @@ namespace RSADupCheck
             {
                 if (!oRSACore.BaseFolder.Equals(txBaseFolder.Text) ||
                     !oRSACore.DbAddress.Equals(txDbAdress.Text) ||
-                    !oRSACore.DbPort.Equals(txDbPort.Text))  //Aconfiguracao ativa e diferente da requisitada
+                    !oRSACore.DbPort.Equals(txDbPort.Text))  //A configuracao ativa e diferente da requisitada
                 {
                     // A pasta informada não existe
                     if (!Directory.Exists(txBaseFolder.Text)) // O local destino informado nao existe
@@ -73,7 +69,9 @@ namespace RSADupCheck
                         // A pasta informada nao existe, porem ja existe configuracao salva
                         if (oRSACore.HasConfigured)
                         {
-                            if (MessageBox.Show("Já existe uma configuração ativa, deseja move-la?", "Alerta !!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            if (MessageBox.Show("Já existe uma configuração ativa, deseja move-la?",
+                                                "Alerta !!",
+                                                MessageBoxButtons.YesNo) == DialogResult.Yes)
                             {
                                 if (!CheckOutputFolder(txBaseFolder.Text.Trim()))
                                 {
@@ -91,8 +89,9 @@ namespace RSADupCheck
                                     SetOutputFolder(txBaseFolder.Text.Trim(), false);
                                     oRSACore.HasConfigured = true;
                                 }
-                                oRSACore.DbAddress = txDbAdress.Text;
-                                oRSACore.DbPort = txDbPort.Text;
+                                oRSACore.BaseFolder = txBaseFolder.Text.Trim();
+                                oRSACore.DbAddress = txDbAdress.Text.Trim();
+                                oRSACore.DbPort = txDbPort.Text.Trim();
                                 SaveSysData();
                             }
                         }
@@ -116,8 +115,8 @@ namespace RSADupCheck
                             oRSACore.BaseFolder = txBaseFolder.Text.Trim();
                             if (!CheckOutputFolder(txBaseFolder.Text.Trim()))
                             {
-                                SetOutputFolder(txBaseFolder.Text, false);
                             }
+                            SetOutputFolder(txBaseFolder.Text, false);
                             oRSACore.DbAddress = txDbAdress.Text;
                             oRSACore.DbPort = txDbPort.Text;
                             SaveSysData();

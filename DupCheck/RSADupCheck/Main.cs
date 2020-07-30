@@ -1,22 +1,10 @@
 ﻿using System;
 using System.Configuration;
-//using System.Collections.Generic;
-//using System.ComponentModel;
-//using System.Data;
-//using System.Drawing;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-//using System.Threading;
-//using System.Data.Sql;
 using RSACoreLib;
 using System.Management;
 using System.Security.AccessControl;
-//using MongoDB.Driver;
-//using MongoDB.Bson;
-//using System.Security.Cryptography.X509Certificates;
 
 namespace RSADupCheck
 {
@@ -27,7 +15,6 @@ namespace RSADupCheck
         private String _BaseFolderTmp;
         private String _StructuredFolderTmp;
         private String _DuplicatedFolderTmp;
-        //StreamWriter oFile;
         public Main()
         {
             InitializeComponent();
@@ -44,6 +31,10 @@ namespace RSADupCheck
             {
                 SetOutputFolder(oRSACore.BaseFolder, false);
                 oRSACore.Connect(); //Connectar ao banco de dados (MongoDB)
+                if (!oRSACore.IsConnected)
+                {
+                    MessageBox.Show("A base de dados está indisponível, \r\n reiniciar a aplicação !!", "Atenção !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
         private void CheckSystem()
@@ -83,6 +74,7 @@ namespace RSADupCheck
         }
         private void SetOutputFolder(String pFolder, Boolean pTemp)
         {
+            //TODO: revisar o codigo para somente criar a pasta temporaria caso o parametro pTemp seja verdadeiro
             // Ajusta as variaveis temporarias para processamento
             _BaseFolderTmp = pFolder;  // Pasta base
             _StructuredFolderTmp = pFolder + @"\Structured\"; // pasta para receber arquivos estruturadas

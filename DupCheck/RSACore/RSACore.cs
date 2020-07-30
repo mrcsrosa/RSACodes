@@ -86,7 +86,15 @@ namespace RSACoreLib
             //database.RunCommandAsync((Command<BsonDocument>)"{ping:1}").Wait(1000);
             if (_MongoClient == null)
             {
-                _MongoClient = new MongoClient("mongodb://" + oRSACore.DbAddress + ":" + oRSACore.DbPort);
+                try
+                {
+                    _MongoClient = new MongoClient("mongodb://" + oRSACore.DbAddress + ":" + oRSACore.DbPort);
+                }
+                catch (Exception oErr)
+                {
+                    IsConnected = false;
+                    return false;
+                }
             }
             try
             {
@@ -100,18 +108,18 @@ namespace RSACoreLib
             catch(Exception oErr)
             {
                 oRSACore.SaveDataAboutException(oErr);
+                IsConnected = false;
                 return false;
             }
-
             RSAVolumes = dbRSADupCheck.GetCollection<BsonDocument>("volumes", null);
             RSAHashes = dbRSADupCheck.GetCollection<BsonDocument>("hashes", null);
             // Associa as collections
-
             IsConnected = true;
             return true;           
         }
         public void SaveDataAboutException(Exception pErr)
         {
+            //TODO: Implementar o codigo para registro de erros e excecoes
             return;
         }
         public String CalcularHash(String pArquivo)
@@ -123,6 +131,7 @@ namespace RSACoreLib
             {
                 oStream = System.IO.File.OpenRead(pArquivo);
                 sHashSolved = BitConverter.ToString(oSHA256.ComputeHash(oStream)).Replace("-", "").ToUpper();
+                oStream.Close();
             }
             catch (PathTooLongException oErr)
             {
@@ -181,6 +190,34 @@ namespace RSACoreLib
                 }
             }
             return _AllowedFolder.ToArray();
+        }
+
+        public String GetSerialVolume(String pDrive)
+        {
+            String sRSASerialVolume = "";
+            if (!File.Exists(pDrive + @".RSASystems\.RSASerialVolume.idx"))
+            {
+                if (!Directory.Exists(pDrive + @".RSASystems\"))
+                {
+                    DirectoryInfo oDirInfo = Directory.CreateDirectory(pDrive + @".RSASystems\");
+                    oDirInfo.Attributes = FileAttributes.Hidden;
+                }
+                sRSASerialVolume = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).ToUpper();
+                //                        FileInfo oSerialVolume = new FileInfo(sDrive + @".RSASystems\.RSASerialVolume.idx");
+                //                        oSerialVolume.CreateText();
+                //                        oSerialVolume.Attributes = FileAttributes.Hidden;
+                //                        oSerialVolume = null;
+                StreamWriter oSaveData = new StreamWriter(pDrive + @".RSASystems\.RSASerialVolume.idx");
+                oSaveData.WriteLine(sRSASerialVolume);
+                oSaveData.Close();
+            }
+            else
+            {
+                StreamReader oReadData = new StreamReader(pDrive + @".RSASystems\.RSASerialVolume.idx");
+                sRSASerialVolume = oReadData.ReadLine();
+                oReadData.Close();
+            }
+            return sRSASerialVolume;
         }
     }
     public class RSAVolume
@@ -328,6 +365,16 @@ namespace RSACoreLib
             RSAData oData = new RSAData();
             return oData.GetHashesForOrganizer();
         }
+        public List<RSAHashAggregate> GetHashesProcessed()
+        {
+            RSAData oData = new RSAData();
+            return oData.GetHashesProcessed();
+        }
+        public List<RSAHashAggregate> GetHashesProcessed(String pFilter)
+        {
+            RSAData oData = new RSAData();
+            return oData.GetHashesProcessed(pFilter);
+        }
 
         public ProcessedStatus UpdatePathStatus()
         {
@@ -336,12 +383,27 @@ namespace RSACoreLib
                                           this.paths[0].filename,
                                           this.paths[0].status);
         }
+        public ProcessedStatus UpdatePathStatus(String pHash, String pFileName, RSAPath.Status pStatus)
+        {
+            RSAData oData = new RSAData();
+            return oData.UpdatePathStatus(pHash,
+                                          pFileName,
+                                          pStatus);
+        }
         public ProcessedStatus UpdatePathStatus(String pNewFileName)
         {
             RSAData oData = new RSAData();
             return oData.UpdatePathStatus(this.hash,
                                           this.paths[0].filename,
                                           this.paths[0].status,
+                                          pNewFileName);
+        }
+        public ProcessedStatus UpdatePathStatus(String pHash, String pFileName, RSAPath.Status pStatus, String pNewFileName)
+        {
+            RSAData oData = new RSAData();
+            return oData.UpdatePathStatus(pHash,
+                                          pFileName,
+                                          pStatus,
                                           pNewFileName);
         }
 
@@ -512,7 +574,7 @@ namespace RSACoreLib
             {
                 var filtro = dbRSADupCheck.GetCollection<BsonDocument>("hashes").Aggregate()
                                           .Match(new BsonDocument{{ "status", 
-                                                 new BsonDocument("$lt", 12)}
+                                                 new BsonDocument("$lt", 12)} //12
                                                                  })
                                           .Project(new BsonDocument{{"_id", "$hash"},
                                                    new BsonDocument{{"hash_id", "$_id" }},
@@ -532,6 +594,83 @@ namespace RSACoreLib
                     _itemAggregate.hash_id = oItem.GetValue("hash_id").ToString();
                     _itemAggregate.contagem = Convert.ToInt32(oItem.GetValue("contagem"));
                     _itemAggregate.status = (RSAHash.ProcessedStatus) Convert.ToInt32(oItem.GetValue("status"));
+                    _aggregate.Add(_itemAggregate);
+                }
+            }
+            catch (Exception oErr)
+            {
+                oRSACore.SaveDataAboutException(oErr);
+                _aggregate = null;
+            }
+            return _aggregate;
+        }
+        internal List<RSAHashAggregate> GetHashesProcessed()
+        {
+            List<RSAHashAggregate> _aggregate = new List<RSAHashAggregate>();
+            try
+            {
+                var filtro = dbRSADupCheck.GetCollection<BsonDocument>("hashes").Aggregate()
+                                          .Match(new BsonDocument{{ "status",
+                                                 new BsonDocument("$gte", 12)} //12
+                                                                 })
+                                          .Project(new BsonDocument{{"_id", "$hash"},
+                                                   new BsonDocument{{"hash_id", "$_id" }},
+                                                   new BsonDocument{{ "status", "$status"}}, {"contagem",
+                                                   new BsonDocument("$size", "$paths")}
+                                                                   })
+                                          .Sort(new BsonDocument{{"contagem", -1}
+                                                                })
+                                          .Match(new BsonDocument{{ "contagem",
+                                                 new BsonDocument("$gt", 0)}}
+                                                );
+                var results = filtro.ToList();
+                foreach (var oItem in results.ToList())
+                {
+                    RSAHashAggregate _itemAggregate = new RSAHashAggregate();
+                    _itemAggregate._id = oItem.GetValue("_id").ToString();
+                    _itemAggregate.hash_id = oItem.GetValue("hash_id").ToString();
+                    _itemAggregate.contagem = Convert.ToInt32(oItem.GetValue("contagem"));
+                    _itemAggregate.status = (RSAHash.ProcessedStatus)Convert.ToInt32(oItem.GetValue("status"));
+                    _aggregate.Add(_itemAggregate);
+                }
+            }
+            catch (Exception oErr)
+            {
+                oRSACore.SaveDataAboutException(oErr);
+                _aggregate = null;
+            }
+            return _aggregate;
+        }
+        internal List<RSAHashAggregate> GetHashesProcessed(String pFilter)
+        {
+            List<RSAHashAggregate> _aggregate = new List<RSAHashAggregate>();
+            try
+            {
+                var builder = Builders<BsonDocument>.Filter;
+                var filter = builder.Gte("status", 12) &
+                             builder.Eq("classification", pFilter);
+
+                var filtro = dbRSADupCheck.GetCollection<BsonDocument>("hashes").Aggregate()
+                                          .Match(filter)
+                                          //.Match(new BsonDocument { { "status", new BsonDocument("$gte", 12) } })
+                                          .Project(new BsonDocument{{"_id", "$hash"},
+                                                   new BsonDocument{{"hash_id", "$_id" }},
+                                                   new BsonDocument{{ "status", "$status"}}, {"contagem",
+                                                   new BsonDocument("$size", "$paths")}
+                                                                   })
+                                          .Sort(new BsonDocument{{"contagem", -1}
+                                                                })
+                                          .Match(new BsonDocument{{ "contagem",
+                                                 new BsonDocument("$gt", 0)}}
+                                                );
+                var results = filtro.ToList();
+                foreach (var oItem in results.ToList())
+                {
+                    RSAHashAggregate _itemAggregate = new RSAHashAggregate();
+                    _itemAggregate._id = oItem.GetValue("_id").ToString();
+                    _itemAggregate.hash_id = oItem.GetValue("hash_id").ToString();
+                    _itemAggregate.contagem = Convert.ToInt32(oItem.GetValue("contagem"));
+                    _itemAggregate.status = (RSAHash.ProcessedStatus)Convert.ToInt32(oItem.GetValue("status"));
                     _aggregate.Add(_itemAggregate);
                 }
             }
@@ -614,7 +753,8 @@ namespace RSACoreLib
             List<String> tmpList = new List<string>();
             var results = dbRSADupCheck.GetCollection<BsonDocument>("hashes").
                                                                    Aggregate().
-                                                                   Group("{_id: '$classification', total: {$sum: 1}}");
+                                                                   Group("{_id: '$classification', total: {$sum: 1}}").
+                                                                   Sort(new BsonDocument {{ "_id", 1 }});
 
             var meu = results.ToList();
             foreach (var sClassification in meu.ToList())
