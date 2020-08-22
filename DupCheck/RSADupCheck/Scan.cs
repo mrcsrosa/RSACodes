@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+//using System.ComponentModel;
+//using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+//using System.Text;
+//using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using System.Configuration;
+//using System.Configuration;
 using RSACoreLib;
 using System.Management;
 using System.Collections;
@@ -16,9 +16,10 @@ namespace RSADupCheck
 {
     public partial class Scan : Form
     {
-        StreamWriter oFile;
+        //StreamWriter oFile;
         private RSACore oRSACore;
         private Hashtable _hashSerialVolume = new Hashtable();
+        private String strFileTypemask;
         public Scan()
         {
             InitializeComponent();
@@ -32,6 +33,143 @@ namespace RSADupCheck
                 FillFolders(cbLogicalDrives.Text.Substring(0, 3));
             }
         }
+        private void FillClassification()
+        {
+            RSAHash oRSAHash = new RSAHash();
+            cmbClassification.Items.Clear();
+            foreach (String strClassification in oRSAHash.GetClassifications())
+            {
+                cmbClassification.Items.Add(strClassification);
+            }
+            oRSAHash = null;
+        }
+        private void FillLogicalDrives()
+        {
+            _hashSerialVolume.Clear();
+            Int32 nPosition;
+            String[] strArrayDrives = Directory.GetLogicalDrives();
+            ManagementObject oVolumes = null;
+            RSAVolume oRSAVolume = new RSAVolume();
+            foreach (String strDrive in strArrayDrives)
+            {
+                // 2 - Removable Disk
+                // 3 - Local Disk
+                // 4 - Network Drive
+                // 5 - Compact Disk
+                oVolumes = new ManagementObject("win32_logicaldisk.deviceid=\"" +
+                                                strDrive.Substring(0, 2) +
+                                                "\"");
+                oVolumes.Get();
+                if (Convert.ToInt32(oVolumes["DriveType"]) >= 2 &&
+                    Convert.ToInt32(oVolumes["DriveType"]) <= 4)
+                {
+                    String sRSASerialVolume = "";
+                    if (!File.Exists(strDrive + @".RSASystems\.RSASerialVolume.idx"))
+                    {
+                        if (!Directory.Exists(strDrive + @".RSASystems\"))
+                        {
+                            DirectoryInfo oDirInfo = Directory.CreateDirectory(strDrive + @".RSASystems\");
+                            oDirInfo.Attributes = FileAttributes.Hidden;
+                        }
+                        sRSASerialVolume = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).ToUpper();
+                        StreamWriter oSaveData = new StreamWriter(strDrive + @".RSASystems\.RSASerialVolume.idx");
+                        oSaveData.WriteLine(sRSASerialVolume);
+                        oSaveData.Close();
+                        oRSAVolume.serial = sRSASerialVolume.Trim();
+                    }
+                    else
+                    {
+                        StreamReader oReadData = new StreamReader(strDrive + @".RSASystems\.RSASerialVolume.idx");
+                        sRSASerialVolume = oReadData.ReadLine();
+                        oRSAVolume.serial = sRSASerialVolume.Trim();
+                    }
+                    if (oRSAVolume.GetVolume() == RSAVolume.Status.SerialNotFound)
+                    {
+                        oRSAVolume.type = oVolumes["DriveType"].ToString();
+                        oRSAVolume.insertDate = DateTime.Now;
+                        oRSAVolume.lastScanningDate = new DateTime();
+                        oRSAVolume.AddVolume();
+                    }
+                    nPosition = cbLogicalDrives.Items.Add(strDrive); // + " => " + oRSAVolume.serial);
+                    _hashSerialVolume.Add(nPosition, oRSAVolume.serial);
+                }
+            }
+            strArrayDrives = null;
+            oVolumes = null;
+        }
+        private void FillFolders(String pLogicalDrive)
+        {
+            var _syspaths_ = Environment.GetEnvironmentVariables();
+            String[] slFolders = Directory.GetDirectories(pLogicalDrive, "*.*", SearchOption.TopDirectoryOnly);
+            foreach (String sFolder in slFolders)
+            {
+                if (sFolder.ToUpper().Contains("$RECYCLE.BIN"))
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["ALLUSERSPROFILE"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["APPDATA"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["CommonProgramFiles"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["CommonProgramFiles(x86)"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["ComSpec"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["DriverData"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["LOCALAPPDATA"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["ProgramData"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["ProgramFiles"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["ProgramFiles(x86)"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["SystemRoot"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["TEMP"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["TMP"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else if (sFolder.ToUpper() == _syspaths_["windir"].ToString().ToUpper())
+                {
+                    continue;
+                }
+                else
+                {
+                    ckbFolders.Items.Add(sFolder);
+                }
+            }
+            ckbFolders.SelectedIndex = 0;
+        }
         private void btHash_Click(object sender, EventArgs e)
         {
             if (ckbFolders.CheckedItems.Count < 1)
@@ -42,6 +180,20 @@ namespace RSADupCheck
             RSAHash oRSAHash = new RSAHash();
             List<RSAPath> oRSAPaths = new List<RSAPath>();
             String _hashvalue_;
+            String strMimeType = "";
+            if (txFileType.Text.ToUpper().Contains("*.JPG") ||
+                txFileType.Text.ToUpper().Contains("*.JPEG"))
+            {
+                strMimeType = @"image/jpeg";
+            }
+            else if (txFileType.Text.ToUpper().Contains("*.MP4"))
+            {
+                strMimeType = @"video/mp4";
+            }
+            else if (txFileType.Text.ToUpper().Contains("*.PDF"))
+            {
+                strMimeType = @"application/pdf";
+            }
             //oFile = new StreamWriter(@"D:\Saida.txt", true);
             pnlStatusProc.Visible = true;
             pBarFolders.Minimum = 0;
@@ -126,6 +278,17 @@ namespace RSADupCheck
                     lbFilename.Text = "";
                     foreach (String pFile in pFiles)
                     {
+                        if (strMimeType == "video/mp4")
+                        {
+                            FileInfo oFileInfo = new FileInfo(pFile);
+                            if (oFileInfo.Length > (300*1024000))
+                            {
+                                oFileInfo = null;
+                                continue;
+                            }
+                            oFileInfo = null;
+                        }
+
                         lbFilename.Text = pFile;
                         try
                         {
@@ -141,6 +304,7 @@ namespace RSADupCheck
                         {
                             oRSAHash.classification = "<<classificar>>";
                             oRSAHash.friendlyname = Path.GetFileName(pFile);
+                            oRSAHash.mimetype = strMimeType;
                             oRSAHash.insertDate = DateTime.Now;
                             oRSAHash.status = RSAHash.ProcessedStatus.NotProcessed;
                             oRSAHash.paths = new List<RSAPath>();
@@ -185,136 +349,6 @@ namespace RSADupCheck
             }
             //oFile.Close();
         }
-        private void FillFolders(String pLogicalDrive)
-        {
-            var _syspaths_ = Environment.GetEnvironmentVariables();
-            String[] slFolders = Directory.GetDirectories(pLogicalDrive, "*.*", SearchOption.TopDirectoryOnly);
-            foreach (String sFolder in slFolders)
-            {
-                if (sFolder.ToUpper().Contains("$RECYCLE.BIN"))
-                {
-                    continue;
-                }
-                else if ( sFolder.ToUpper() ==_syspaths_["ALLUSERSPROFILE"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["APPDATA"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["CommonProgramFiles"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["CommonProgramFiles(x86)"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["ComSpec"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["DriverData"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["LOCALAPPDATA"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["ProgramData"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["ProgramFiles"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["ProgramFiles(x86)"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["SystemRoot"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["TEMP"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["TMP"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else if (sFolder.ToUpper() == _syspaths_["windir"].ToString().ToUpper())
-                {
-                    continue;
-                }
-                else
-                {
-                    ckbFolders.Items.Add(sFolder);
-                }
-            }
-            ckbFolders.SelectedIndex = 0;
-        }
-        private void FillLogicalDrives()
-        {
-            _hashSerialVolume.Clear();
-            Int32 nPosition;
-            String[] oDrives = Directory.GetLogicalDrives();
-            ManagementObject oVolumes = null;
-            RSAVolume oRSAVolume = new RSAVolume();
-            foreach (String sDrive in oDrives)
-            {
-                // 2 - Removable Disk
-                // 3 - Local Disk
-                // 4 - Network Drive
-                // 5 - Compact Disk
-                oVolumes = new ManagementObject("win32_logicaldisk.deviceid=\"" + 
-                                                sDrive.Substring(0, 2) + 
-                                                "\"");
-                oVolumes.Get();
-                if (Convert.ToInt32(oVolumes["DriveType"]) >= 2 && 
-                    Convert.ToInt32(oVolumes["DriveType"]) <= 4)
-                {
-                    String sRSASerialVolume = "";
-                    if (!File.Exists(sDrive + @".RSASystems\.RSASerialVolume.idx"))
-                    {
-                        if (!Directory.Exists(sDrive + @".RSASystems\"))
-                        {
-                            DirectoryInfo oDirInfo = Directory.CreateDirectory(sDrive + @".RSASystems\");
-                            oDirInfo.Attributes = FileAttributes.Hidden;                            
-                        }
-                        sRSASerialVolume = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).ToUpper();
-//                        FileInfo oSerialVolume = new FileInfo(sDrive + @".RSASystems\.RSASerialVolume.idx");
-//                        oSerialVolume.CreateText();
-//                        oSerialVolume.Attributes = FileAttributes.Hidden;
-//                        oSerialVolume = null;
-                        StreamWriter oSaveData = new StreamWriter(sDrive + @".RSASystems\.RSASerialVolume.idx");
-                        oSaveData.WriteLine(sRSASerialVolume);
-                        oSaveData.Close();
-                        oRSAVolume.serial = sRSASerialVolume.Trim();
-                    }
-                    else
-                    {
-                        StreamReader oReadData = new StreamReader(sDrive + @".RSASystems\.RSASerialVolume.idx");
-                        sRSASerialVolume = oReadData.ReadLine();
-                        oRSAVolume.serial = sRSASerialVolume.Trim();
-                    }
-//                    oRSAVolume.serial = oVolumes["VolumeSerialNumber"] == null ? "0000-0000" : oVolumes["VolumeSerialNumber"].ToString();
-                    if (oRSAVolume.GetVolume() == RSAVolume.Status.SerialNotFound)
-                    {
-                        oRSAVolume.type = oVolumes["DriveType"].ToString();
-                        oRSAVolume.insertDate = DateTime.Now;
-                        oRSAVolume.lastScanningDate = new DateTime();
-                        oRSAVolume.AddVolume();
-                    }
-                    nPosition = cbLogicalDrives.Items.Add(sDrive); // + " => " + oRSAVolume.serial);
-                    _hashSerialVolume.Add(nPosition, oRSAVolume.serial);
-                }
-            }
-        }
         private void cbLogicalDrives_SelectedIndexChanged(object sender, EventArgs e)
         {
             ckbFolders.Items.Clear();
@@ -347,21 +381,11 @@ namespace RSADupCheck
             }
             pnlImportar.Refresh();
         }
-
         private void btFolderBrowsing_Click(object sender, EventArgs e)
         {
             fldrBrowsing.ShowDialog();
             txForImporting.Text = fldrBrowsing.SelectedPath.Trim();
         }
-        private void FillClassification()
-        {
-            RSAHash oRSAHash = new RSAHash();
-            foreach (String sClassification in oRSAHash.GetClassifications())
-            {
-                cmbClassification.Items.Add(sClassification);
-            }
-        }
-
         private void btImportar_Click(object sender, EventArgs e)
         {
             if (cmbClassification.Text.ToUpper().Equals("<<CLASSIFICAR>>") ||
@@ -370,27 +394,48 @@ namespace RSADupCheck
                 MessageBox.Show("Importação não classificada ou pasta não informada !!\r\nPor favor validar", "Atenção !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            strFileTypemask = cmbClassification.Text.ToUpper().Trim();
             ImportFolder();
+            FillClassification();
         }
-
         private void ImportFolder()
         {
             String sSerialVolume;
-            String[] sFiles = Directory.GetFiles(txForImporting.Text,
-                                                 txFileTypeForImport.Text,
-                                                 SearchOption.TopDirectoryOnly);
+            List<String> sFiles = new List<String>();
+            String[] arrayFileType = txFileTypeForImport.Text.Split(';');
+            foreach (String sFilterType in arrayFileType)
+            {
+                sFiles.AddRange(Directory.GetFiles(txForImporting.Text,
+                                          sFilterType,
+                                          SearchOption.TopDirectoryOnly).ToList());
+            }
             StreamReader oReadData = new StreamReader(Path.GetPathRoot(txForImporting.Text) + @".RSASystems\.RSASerialVolume.idx");
             sSerialVolume = oReadData.ReadLine();
-
-            if (sFiles.Length == 0)
+            if (sFiles.Count == 0)
             {
                 //TODO: implementar mensagem informando que não há arquivos
                 return;
             }
             else
             {
+                String strMimeType = "";
+                if (txFileTypeForImport.Text.ToUpper().Contains("*.JPG") ||
+                    txFileTypeForImport.Text.ToUpper().Contains("*.JPEG"))
+                {
+                    strMimeType = @"image/jpeg";
+                }
+                else if (txFileTypeForImport.Text.ToUpper().Contains("*.MP4"))
+                {
+                    strMimeType = @"video/mp4";
+                }
+                else if (txFileTypeForImport.Text.ToUpper().Contains("*.PDF"))
+                {
+                    strMimeType = @"application/pdf";
+                }
+
                 pbProcessamento.Minimum = 0;
-                pbProcessamento.Maximum = sFiles.Length;
+                pbProcessamento.Maximum = sFiles.Count;
+                pbProcessamento.Value = 0;
                 pbProcessamento.Visible = true;
 
                 RSAHash oRSAHash = new RSAHash();
@@ -417,156 +462,95 @@ namespace RSADupCheck
                     {
                         oRSAHash.classification = cmbClassification.Text.Trim().ToUpper();
                         oRSAHash.friendlyname = sRandomFileName;
+                        oRSAHash.mimetype = strMimeType;
                         oRSAHash.insertDate = DateTime.Now;
                         oRSAHash.tags = txTagsForImport.Text;
                         RSAPath oRSAPath = new RSAPath();
                         oRSAPath.oldfilename = sFileName;
-                        oRSAPath.filename = sFolderDestination + sRandomFileName;
+                        oRSAPath.filename = @"<BASEFOLDER>\Structured\" + 
+                                            cmbClassification.Text.Trim() +
+                                            @"\" +
+                                            sRandomFileName;
                         oRSAPath.insertDate = DateTime.Now;
                         oRSAPath.volume = sSerialVolume;
+                        try
+                        {
+                            File.Move(sFileName, sFolderDestination +
+                                                 sRandomFileName);
+                        }
+                        catch (Exception oErr)
+                        {
+                            //TODO: implementar tratamento de erro para IO Move
+                        }
                         oRSAHash.paths = new List<RSAPath>();
                         oRSAHash.paths.Add(oRSAPath);
                         oRSAPath.status = RSAPath.Status.Processed;
-                        if (!File.Exists(sFolderDestination + sRandomFileName))
-                        {
-                            try
-                            {
-                                File.Move(sFileName, sFolderDestination +
-                                                     sRandomFileName);
-                            }
-                            catch (Exception oErr)
-                            {
-                                //TODO: implementar tratamento de erro para IO Move
-                            }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                File.Move(sFileName, sFolderDestination +
-                                                     new Random().Next(100).ToString() +
-                                                     "_" +
-                                                     sRandomFileName);
-                            }
-                            catch (Exception oErr)
-                            {
-                                //TODO: implementar tratamento de erro para IO Move
-                            }
-                        }
                         oRSAHash.status = RSAHash.ProcessedStatus.Processed;
                         oRSAHash.AddHash();
                     }
                     else
                     {
-                       // Check if path is already registered
-                        Boolean bRegisteredBefore = false;
+                        // TOPTOPTOPTOP
                         for (Int32 nCount = 0; nCount < oRSAHash.paths.Count; nCount++)
                         {
-                            if (oRSAHash.paths[nCount].oldfilename == sFileName ||
-                                oRSAHash.paths[nCount].filename == sFileName)
+                            String[] arrayFileParts = oRSAHash.paths[nCount].filename.Split('\\');
+                            String sFile = arrayFileParts[arrayFileParts.Length - 1];
+                            if (oRSAHash.paths[nCount].status == RSAPath.Status.Processed)
                             {
-                                bRegisteredBefore = true;
-                                break;
+                                try
+                                {
+                                    File.Move(oRSAHash.paths[nCount].filename.Replace(@"<BASEFOLDER>",
+                                                                                      oRSACore.BaseFolder),
+                                              oRSACore.DuplicatedFolder +
+                                              sFile);
+                                }
+                                catch (Exception oErr)
+                                {
+                                    sFile = DateTime.Now.Millisecond.ToString().Trim() + sFile;
+                                    File.Move(oRSAHash.paths[nCount].filename.Replace(@"<BASEFOLDER>",
+                                                                                      oRSACore.BaseFolder),
+                                              oRSACore.DuplicatedFolder +
+                                              sFile);
+                                }
+                                oRSAHash.UpdatePathStatus(oRSAHash.hash,
+                                                          oRSAHash.paths[nCount].filename,
+                                                          RSAPath.Status.KillIt,
+                                                          @"<BASEFOLDER>\Duplicated\" + sFile);
+                            }
+                            else
+                            {
+                                oRSAHash.UpdatePathStatus(oRSAHash.hash,
+                                                          oRSAHash.paths[nCount].filename,
+                                                          RSAPath.Status.KillIt);
                             }
                         }
-                        if (!bRegisteredBefore)
+                        RSAPath oRSAPath = new RSAPath();
+                        oRSAPath.filename = @"<BASEFOLDER>\Structured\" +
+                                            cmbClassification.Text.Trim() +
+                                            @"\" +
+                                            sRandomFileName;
+                        oRSAPath.oldfilename = sFileName;
+                        oRSAPath.insertDate = DateTime.Now;
+                        oRSAPath.volume = sSerialVolume;
+                        oRSAPath.status = RSAPath.Status.Processed;
+                        oRSAHash.AddPath(oRSAPath);
+                        try
                         {
-                            if (oRSAHash.classification != cmbClassification.Text.Trim()) 
-                            {
-                                oRSAHash.classification = cmbClassification.Text.Trim();
-                            }
-                            for (Int32 nCount = 0; nCount < oRSAHash.paths.Count; nCount++)
-                            {
-                                if (oRSAHash.paths[nCount].status == RSAPath.Status.Processed)
-                                {
-                                    try
-                                    {
-                                        File.Move(oRSAHash.paths[nCount].filename,
-                                                  oRSACore.DuplicatedFolder + sRandomFileName);
-                                    }
-                                    catch (Exception oErr)
-                                    {
-                                    }
-                                    oRSAHash.UpdatePathStatus(oRSAHash.hash,
-                                                              oRSAHash.paths[nCount].filename,
-                                                              RSAPath.Status.KillIt,
-                                                              oRSACore.DuplicatedFolder + sRandomFileName);
-                                }
-                                else
-                                {
-                                    oRSAHash.UpdatePathStatus(oRSAHash.hash, 
-                                                              oRSAHash.paths[nCount].filename,
-                                                              RSAPath.Status.KillIt);
-                                }
-                            }
-                            RSAPath oRSAPath = new RSAPath();
-                            oRSAPath.filename = sFolderDestination + sRandomFileName;
-                            oRSAPath.oldfilename = sFileName;
-                            oRSAPath.insertDate = DateTime.Now;
-                            oRSAPath.volume = sSerialVolume;
-                            oRSAPath.status = RSAPath.Status.Processed;
-                            oRSAHash.AddPath(oRSAPath);
-                            try
-                            {
-                                File.Move(sFileName, sFolderDestination + sRandomFileName);
-                            }
-                            catch (Exception oErr)
-                            {
-                            }
-                            oRSAHash.status = RSAHash.ProcessedStatus.Processed;
-                            oRSAHash.tags = txTagsForImport.Text;
-                            oRSAHash.classification = cmbClassification.Text.Trim();
-                            oRSAHash.UpdateMetadata();
+                            File.Move(sFileName, sFolderDestination + sRandomFileName);
                         }
-                        else
+                        catch (Exception oErr)
                         {
-                            Boolean bHasProcessed = false;
-                            for (Int32 nCount = 0; nCount < oRSAHash.paths.Count; nCount++)
-                            {
-                                if (oRSAHash.paths[nCount].status == RSAPath.Status.Processed)
-                                {
-                                    bHasProcessed = true;
-                                    break;
-                                }
-                            }
-                            if (bHasProcessed)
-                            {
-                                for (Int32 nCount = 0; nCount < oRSAHash.paths.Count; nCount++)
-                                {
-                                    if (oRSAHash.paths[nCount].status == RSAPath.Status.Processed)
-                                    {
-                                        if (oRSAHash.classification != cmbClassification.Text.Trim())
-                                        {
-                                            File.Move(oRSAHash.paths[nCount].filename,
-                                                      oRSACore.DuplicatedFolder + Path.GetFileName(oRSAHash.paths[nCount].filename));
-                                            File.Move(sFileName,
-                                                      sFolderDestination + sRandomFileName);
-                                        }
-                                        oRSAHash.UpdatePathStatus(oRSAHash.hash,
-                                                                  oRSAHash.paths[nCount].filename,
-                                                                  RSAPath.Status.Processed,
-                                                                  sFolderDestination + sRandomFileName);
-                                    }
-                                    else
-                                    {
-                                        oRSAHash.UpdatePathStatus(oRSAHash.hash,
-                                                                  oRSAHash.paths[nCount].filename,
-                                                                  RSAPath.Status.KillIt);
-                                    }
-                                }
-                                oRSAHash.status = RSAHash.ProcessedStatus.Processed;
-                                oRSAHash.tags = txTagsForImport.Text;
-                                oRSAHash.classification = cmbClassification.Text.Trim();
-                                oRSAHash.UpdateMetadata();
-                            }
                         }
+                        oRSAHash.status = RSAHash.ProcessedStatus.Processed;
+                        oRSAHash.tags = txTagsForImport.Text;
+                        oRSAHash.classification = cmbClassification.Text.Trim();
+                        oRSAHash.UpdateMetadata();
                     }
                     pbProcessamento.Value++;
                 }
                 pbProcessamento.Visible = false;
             }
         }
-
         private void CheckFolderClassification(string pFolder)
         {
             if (!Directory.Exists(pFolder))
@@ -574,7 +558,6 @@ namespace RSADupCheck
                 Directory.CreateDirectory(pFolder);
             }
         }
-
         private void cmbClassification_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (Char.IsLetter(e.KeyChar)) e.KeyChar = Char.ToUpper(e.KeyChar);

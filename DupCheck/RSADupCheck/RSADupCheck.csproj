@@ -231,6 +231,43 @@
   <ItemGroup>
     <None Include="Resources\Database.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Knob Shuffle On.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Left-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Recycle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Recycle1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Trash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="AxWMPLib">
+      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>aximp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="WMPLib">
+      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets" Condition="Exists('..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -12,6 +12,7 @@ using SharpCompress.Common;
 using MongoDB.Driver.Core.Clusters.ServerSelectors;
 using System.Security.Cryptography;
 using System.Security.Permissions;
+using System.Dynamic;
 
 namespace RSACoreLib
 {
@@ -191,7 +192,6 @@ namespace RSACoreLib
             }
             return _AllowedFolder.ToArray();
         }
-
         public String GetSerialVolume(String pDrive)
         {
             String sRSASerialVolume = "";
@@ -218,6 +218,32 @@ namespace RSACoreLib
                 oReadData.Close();
             }
             return sRSASerialVolume;
+        }
+        public String GetDriveLetterBySerial(String pSerial)
+        {
+            String strDriveLetter = "";
+
+            String[] strArrayDrives = Directory.GetLogicalDrives();
+
+            RSAVolume oRSAVolume = new RSAVolume();
+            foreach (String strDrive in strArrayDrives)
+            {
+                // 2 - Removable Disk
+                // 3 - Local Disk
+                // 4 - Network Drive
+                // 5 - Compact Disk
+
+                if (File.Exists(strDrive + @".RSASystems\.RSASerialVolume.idx"))
+                {
+                    StreamReader oReadData = new StreamReader(strDrive + @".RSASystems\.RSASerialVolume.idx");
+                    if (pSerial == oReadData.ReadLine().Trim())
+                    {
+                        strDriveLetter = strDrive;
+                        break;
+                    }
+                }
+            }
+            return strDriveLetter;
         }
     }
     public class RSAVolume
@@ -315,11 +341,12 @@ namespace RSACoreLib
         }
         public String hash;
         public List<RSAPath> paths { get; set; }
-        public String classification;
-        public String friendlyname;
-        public String tags;
-        public DateTime insertDate;
-        public ProcessedStatus status;
+        public String classification { get; set; }
+        public String friendlyname { get; set; }
+        public String tags { get; set; }
+        public String mimetype { get; set; }
+        public DateTime insertDate { get; set; }
+        public ProcessedStatus status { get; set; }
         public ProcessedStatus GetRSAHash()
         {
             RSAHash _this;
@@ -330,6 +357,7 @@ namespace RSACoreLib
                 classification = _this.classification;
                 friendlyname = _this.friendlyname;
                 tags = _this.tags;
+                mimetype = _this.mimetype;
                 insertDate = _this.insertDate;
                 paths = _this.paths;
                 status = _this.status;
@@ -337,17 +365,16 @@ namespace RSACoreLib
             }
             return RSAHash.ProcessedStatus.NotFound;
         }
-
         public ProcessedStatus UpdateMetadata()
         {
             RSAData oData = new RSAData();
             return oData.UpdateMetadata(this.hash,
                                         this.classification,
                                         this.friendlyname,
+                                        this.mimetype,
                                         this.tags,
-                                        this.status);
+                                        this.status); ;
         }
-
         public void AddPath(RSAPath pRSAPath)
         {
             RSAData oData = new RSAData();
@@ -375,7 +402,6 @@ namespace RSACoreLib
             RSAData oData = new RSAData();
             return oData.GetHashesProcessed(pFilter);
         }
-
         public ProcessedStatus UpdatePathStatus()
         {
             RSAData oData = new RSAData();
@@ -398,6 +424,13 @@ namespace RSACoreLib
                                           this.paths[0].status,
                                           pNewFileName);
         }
+        public ProcessedStatus QG(String pHash, String pFilename, String pNewFileName)
+        {
+            RSAData oData = new RSAData();
+            return oData.QG(pHash,
+                            pFilename,
+                            pNewFileName);
+        }
         public ProcessedStatus UpdatePathStatus(String pHash, String pFileName, RSAPath.Status pStatus, String pNewFileName)
         {
             RSAData oData = new RSAData();
@@ -406,21 +439,26 @@ namespace RSACoreLib
                                           pStatus,
                                           pNewFileName);
         }
-
-        public Boolean Delete()
+        public Boolean Delete(string hash)
         {
             RSAData oRSAData = new RSAData();
             if (oRSAData.Delete(this.hash) > 0) return true;
 
             return false;
         }
-
         public List<String> GetClassifications()
         {
             RSAData oRSAData = new RSAData();
             return oRSAData.GetClassifications();
         }
-
+        public Boolean Delete(String pHash,
+                           String pVolume, 
+                           String pFilename)
+        {
+            RSAData oRSAData = new RSAData();
+            if (oRSAData.Delete(pHash, pVolume, pFilename)) return true;
+            return false;
+        }
         // hashes
         // {
         //      hash,
@@ -533,6 +571,7 @@ namespace RSACoreLib
                 _RSAHash.hash = mgReturn.GetValue("hash").ToString();
                 _RSAHash.classification = mgReturn.GetValue("classification").ToString();
                 _RSAHash.friendlyname = mgReturn.GetValue("friendlyname").ToString();
+                _RSAHash.mimetype = mgReturn.GetValue("mimetype").ToString();
                 _RSAHash.insertDate = Convert.ToDateTime(mgReturn.GetValue("insertDate").ToString());
                 _RSAHash.tags = mgReturn.GetValue("tags").IsBsonNull? "" : mgReturn.GetValue("tags").ToString();
                 _RSAHash.status = (RSAHash.ProcessedStatus) Convert.ToInt32(mgReturn.GetValue("status").ToString());
@@ -681,11 +720,17 @@ namespace RSACoreLib
             }
             return _aggregate;
         }
-        internal RSAHash.ProcessedStatus UpdateMetadata(String pHash, String pClassification, String pFriendlyName, String pTags, RSAHash.ProcessedStatus pStatus)
+        internal RSAHash.ProcessedStatus UpdateMetadata(String pHash,
+                                                        String pClassification,
+                                                        String pFriendlyName,
+                                                        String pMimetype,
+                                                        String pTags,
+                                                        RSAHash.ProcessedStatus pStatus)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
             var up = Builders<BsonDocument>.Update.Set("classification", pClassification)
                                                   .Set("friendlyname", pFriendlyName)
+                                                  .Set("mimetype", pMimetype)
                                                   .Set("tags", pTags)
                                                   .Set("status", pStatus );
             try
@@ -741,13 +786,32 @@ namespace RSACoreLib
                 return RSAHash.ProcessedStatus.NotProcessed;
             }
         }
+        internal RSAHash.ProcessedStatus QG(String pHash, String pFilename, String pNewFilename)
+        {
+            var upOption = new UpdateOptions();
+            var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
+            upOption.ArrayFilters = new List<ArrayFilterDefinition> {
+                new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("element.filename",
+                                 pFilename)) };
+            var up = Builders<BsonDocument>.Update.Set("paths.$[element].filename", pNewFilename);
+            try
+            {
+                UpdateResult oRetCode = dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, up, upOption);
+                return RSAHash.ProcessedStatus.MetaRevised;
+            }
+            catch (Exception oErr)
+            {
+                oRSACore.SaveDataAboutException(oErr);
+                return RSAHash.ProcessedStatus.NotProcessed;
+            }
+        }
         internal Int32 Delete(string pHash)
         {
             var deleteFilter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
             DeleteResult oRetCode =  dbRSADupCheck.GetCollection<BsonDocument>("hashes").DeleteOne(deleteFilter);
             return (Int32) oRetCode.DeletedCount;
         }
-
         internal List<String> GetClassifications()
         {
             List<String> tmpList = new List<string>();
@@ -763,6 +827,34 @@ namespace RSACoreLib
             }
 
             return tmpList;
+        }
+        internal bool Delete(string pHash, string pVolume, string pFilename)
+        {
+            var upOption = new UpdateOptions();
+            var filter = Builders<BsonDocument>.Filter.Eq("hash", pHash);
+            var update = Builders<BsonDocument>.Update
+                                               .PullFilter("paths",
+                                                           Builders<BsonDocument>.Filter.And(
+                                                           Builders<BsonDocument>.Filter.Eq("volume", pVolume),
+                                                           Builders<BsonDocument>.Filter.Eq("filename", pFilename)));
+
+            try
+            {
+                var rc = dbRSADupCheck.GetCollection<BsonDocument>("hashes").UpdateOne(filter, update);
+                if (rc.ModifiedCount == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception oErr)
+            {
+                oRSACore.SaveDataAboutException(oErr);
+                return false;
+            }
         }
     }
 }

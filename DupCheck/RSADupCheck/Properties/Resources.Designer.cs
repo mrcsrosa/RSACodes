@@ -153,6 +153,26 @@ namespace RSADupCheck.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Knob_Shuffle_On {
+            get {
+                object obj = ResourceManager.GetObject("Knob Shuffle On", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Left_right {
+            get {
+                object obj = ResourceManager.GetObject("Left-right", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Modify {
             get {
                 object obj = ResourceManager.GetObject("Modify", resourceCulture);
@@ -186,6 +206,46 @@ namespace RSADupCheck.Properties {
         internal static System.Drawing.Bitmap OK {
             get {
                 object obj = ResourceManager.GetObject("OK", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Recycle {
+            get {
+                object obj = ResourceManager.GetObject("Recycle", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Recycle1 {
+            get {
+                object obj = ResourceManager.GetObject("Recycle1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Search {
+            get {
+                object obj = ResourceManager.GetObject("Search", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Trash {
+            get {
+                object obj = ResourceManager.GetObject("Trash", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

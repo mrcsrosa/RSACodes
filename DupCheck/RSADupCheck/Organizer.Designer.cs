@@ -55,11 +55,16 @@
             this.txProcessStatus = new System.Windows.Forms.TextBox();
             this.ckAddProcessed = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lbTotalRecord = new System.Windows.Forms.Label();
+            this.lbNumRecord = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.btPreviousHash = new System.Windows.Forms.Button();
             this.btNextHash = new System.Windows.Forms.Button();
             this.btPurgeHash = new System.Windows.Forms.Button();
             this.btProcessarImagem = new System.Windows.Forms.Button();
             this.btRetornar = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -356,6 +361,10 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.lbTotalRecord);
+            this.groupBox2.Controls.Add(this.lbNumRecord);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.ckAddProcessed);
             this.groupBox2.Controls.Add(this.btPreviousHash);
@@ -371,6 +380,48 @@
             this.groupBox2.Size = new System.Drawing.Size(541, 157);
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
+            // 
+            // lbTotalRecord
+            // 
+            this.lbTotalRecord.AutoSize = true;
+            this.lbTotalRecord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbTotalRecord.ForeColor = System.Drawing.Color.Blue;
+            this.lbTotalRecord.Location = new System.Drawing.Point(410, 120);
+            this.lbTotalRecord.Name = "lbTotalRecord";
+            this.lbTotalRecord.Size = new System.Drawing.Size(39, 15);
+            this.lbTotalRecord.TabIndex = 21;
+            this.lbTotalRecord.Text = "9999";
+            // 
+            // lbNumRecord
+            // 
+            this.lbNumRecord.AutoSize = true;
+            this.lbNumRecord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbNumRecord.ForeColor = System.Drawing.Color.Blue;
+            this.lbNumRecord.Location = new System.Drawing.Point(340, 120);
+            this.lbNumRecord.Name = "lbNumRecord";
+            this.lbNumRecord.Size = new System.Drawing.Size(39, 15);
+            this.lbNumRecord.TabIndex = 20;
+            this.lbNumRecord.Text = "9999";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(381, 120);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(23, 15);
+            this.label3.TabIndex = 19;
+            this.label3.Text = "de";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(271, 120);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(65, 15);
+            this.label2.TabIndex = 18;
+            this.label2.Text = "Registro:";
             // 
             // btPreviousHash
             // 
@@ -422,11 +473,22 @@
             this.btRetornar.UseVisualStyleBackColor = true;
             this.btRetornar.Click += new System.EventHandler(this.btRetornar_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(355, 187);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(36, 19);
+            this.button1.TabIndex = 19;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Organizer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1114, 724);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.btProcessarImagem);
             this.Controls.Add(this.panel2);
@@ -480,5 +542,10 @@
         private System.Windows.Forms.Label lblFilename;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label lbTotalRecord;
+        private System.Windows.Forms.Label lbNumRecord;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
     }
 }

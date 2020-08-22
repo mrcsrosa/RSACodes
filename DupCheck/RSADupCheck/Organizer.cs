@@ -72,8 +72,19 @@ namespace RSADupCheck
             nCurrentImage = 0;
             lblCurrentImage.Text = (nCurrentImage + 1).ToString();
             pBox.Image = null;
-            pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename;
-            lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename;
+            if (oCurrentRSAHash.paths[nCurrentImage].filename.Contains("<BASEFOLDER>"))
+            {
+                pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename.Replace("<BASEFOLDER>",                 
+                                                                                           oRSACore.BaseFolder);
+                lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename.Replace("<BASEFOLDER>",
+                                                                                         oRSACore.BaseFolder);
+            }
+            else
+            {
+                String strDriveLetter = oRSACore.GetDriveLetterBySerial(oCurrentRSAHash.paths[nCurrentImage].volume);
+                pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename;
+                lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename;
+            }
             pBox.SizeMode = PictureBoxSizeMode.Zoom;
 
             if (oCurrentRSAHash.status == RSAHash.ProcessedStatus.NotProcessed)
@@ -129,9 +140,12 @@ namespace RSADupCheck
                 btMetaUpdate.Enabled = true;
                 btProcessarImagem.Enabled = true;
             }
+            lbNumRecord.Text = (nCurrentHash+1).ToString();
+            lbTotalRecord.Text = oRSAHashes.Rows.Count.ToString();
         }
         private void LoadHashes()
         {
+            oRSAHashes.Clear();
             oRSAHashes.Columns.Add("hash_id", typeof(String));
             oRSAHashes.Columns.Add("_id", typeof(String));
             oRSAHashes.Columns.Add("contagem", typeof(Int32));
@@ -145,6 +159,7 @@ namespace RSADupCheck
                                     oOrganizer[nCount].contagem.ToString(),
                                     (RSAHash.ProcessedStatus) oOrganizer[nCount].status);
             }
+            lbTotalRecord.Text = oOrganizer.Count.ToString();
         }
         private void SetButtonsState()
         {
@@ -344,6 +359,9 @@ namespace RSADupCheck
                                       @"\" + sRandomFileName +
                                       Path.GetExtension(oCurrentRSAHash.paths[0].filename.Trim()));
                         }
+                        catch (FileNotFoundException oErr)
+                        {
+                        }
                         catch (Exception oErr)
                         {
                             File.Move(oCurrentRSAHash.paths[0].filename.Trim(),
@@ -402,6 +420,10 @@ namespace RSADupCheck
                                           sRandomFileName +
                                           Path.GetExtension(oCurrentRSAHash.paths[nCount].filename.Trim()));
                             }
+                            catch(FileNotFoundException oErr)
+                            {
+
+                            }
                             catch (Exception oErr)
                             {
                                 sRandomFileName = sRandomFileName + "_" + nCount.ToString();
@@ -416,7 +438,7 @@ namespace RSADupCheck
                             oRSAHash.paths = new List<RSAPath>();
                             oRSAHash.paths.Add(oRSAPath);
 
-                            oRSAHash.UpdatePathStatus(oRSACore.DuplicatedFolder +
+                            oRSAHash.UpdatePathStatus(@"<BASEFOLDER>\Duplicated\" +
                                                       sRandomFileName +
                                                       Path.GetExtension(oCurrentRSAHash.paths[nCount].filename.Trim()));
                         }
@@ -475,7 +497,7 @@ namespace RSADupCheck
 
                     }
                 }
-                oCurrentRSAHash.Delete();
+                oCurrentRSAHash.Delete(oCurrentRSAHash.hash);
                 oRSAHashes.Rows[nCurrentHash].Delete();
                 if (oRSAHashes.Rows.Count > 0)
                 {
@@ -566,8 +588,18 @@ namespace RSADupCheck
             nCurrentImage--;
             lblCurrentImage.Text = (nCurrentImage + 1).ToString();
             pBox.Image = null;
-            pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename;
-            lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename;
+            if (oCurrentRSAHash.paths[nCurrentImage].filename.Contains("<BASEFOLDER>"))
+            {
+                pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename.Replace("<BASEFOLDER>",
+                                                                                           oRSACore.BaseFolder);
+                lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename.Replace("<BASEFOLDER>",
+                                                                                         oRSACore.BaseFolder);
+            }
+            else
+            {
+                pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename;
+                lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename;
+            }
             pBox.SizeMode = PictureBoxSizeMode.Zoom;
             if (nCurrentImage == 0)
             {
@@ -585,8 +617,18 @@ namespace RSADupCheck
             nCurrentImage++;
             lblCurrentImage.Text = (nCurrentImage + 1).ToString();
             pBox.Image = null;
-            pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename;
-            lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename;
+            if (oCurrentRSAHash.paths[nCurrentImage].filename.Contains("<BASEFOLDER>"))
+            {
+                pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename.Replace("<BASEFOLDER>",
+                                                                                           oRSACore.BaseFolder);
+                lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename.Replace("<BASEFOLDER>",
+                                                                                         oRSACore.BaseFolder);
+            }
+            else
+            {
+                pBox.ImageLocation = oCurrentRSAHash.paths[nCurrentImage].filename;
+                lblFilename.Text = oCurrentRSAHash.paths[nCurrentImage].filename;
+            }
             pBox.SizeMode = PictureBoxSizeMode.Zoom;
             if (nCurrentImage == (oCurrentRSAHash.paths.Count - 1))
             {
@@ -597,6 +639,70 @@ namespace RSADupCheck
             {
                 btNextImage.Enabled = true;
                 btPreviousImage.Enabled = true;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            RSAHash oRSAHash = new RSAHash();
+            for (Int32 nCount = 0; nCount < oRSAHashes.Rows.Count; nCount++ )
+            {
+                oRSAHash.hash = oRSAHashes.Rows[nCount]["_id"].ToString();
+                oRSAHash.GetRSAHash();
+                if (nCount > 10000)
+                {
+                    String x = "";
+                }
+                Boolean bFind = false;
+                foreach (RSAPath oRSAPath in oRSAHash.paths)
+                {
+                    if (oRSAPath.filename.Contains("<BASEFOLDER>"))
+                    {
+                        if (File.Exists(oRSAPath.filename.Replace("<BASEFOLDER>",
+                                                                  oRSACore.BaseFolder)))
+                        {
+                            bFind = true;
+                        }
+                        else
+                        {
+                            oRSAHash.Delete(oRSAHash.hash, oRSAPath.volume, oRSAPath.filename);
+                        }
+                    }
+                    else
+                    {
+                        if (File.Exists(oRSAPath.filename))
+                        {
+                            bFind = true;
+                        }
+                        else
+                        {
+                            oRSAHash.Delete(oRSAHash.hash, oRSAPath.volume, oRSAPath.filename);
+                        }
+                    }
+                }
+                if (!bFind)
+                {
+                    oRSAHash.Delete(oRSAHash.hash);
+                }
+            }
+            return;
+            //RSAHash oRSAHash = new RSAHash();
+
+            for (Int32 nCnt = 0; nCnt < oRSAHashes.Rows.Count; nCnt++)
+            {
+                oCurrentRSAHash.hash = oRSAHashes.Rows[nCnt]["_id"].ToString();
+                oCurrentRSAHash.GetRSAHash();
+                foreach(RSAPath oPath in oCurrentRSAHash.paths)
+                {
+                    if (oPath.status == (RSAPath.Status)4)
+                    {
+                        String sFile = oPath.filename.Substring(12);
+                    }
+                    else if (oPath.status == (RSAPath.Status)17)
+                    {
+                        String sFile = oPath.filename.Substring(12);
+                    }
+                }
             }
         }
     }
