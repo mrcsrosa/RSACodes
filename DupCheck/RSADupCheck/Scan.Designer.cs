@@ -51,20 +51,20 @@
             this.label11 = new System.Windows.Forms.Label();
             this.pnlImportar = new System.Windows.Forms.Panel();
             this.lblGira = new System.Windows.Forms.Label();
+            this.btHash = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pbProcessamento = new System.Windows.Forms.ProgressBar();
             this.txTagsForImport = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.txFileTypeForImport = new System.Windows.Forms.TextBox();
+            this.btImportar = new System.Windows.Forms.Button();
             this.cmbClassification = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.btFolderBrowsing = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.txForImporting = new System.Windows.Forms.TextBox();
             this.fldrBrowsing = new System.Windows.Forms.FolderBrowserDialog();
-            this.btImportar = new System.Windows.Forms.Button();
-            this.btFolderBrowsing = new System.Windows.Forms.Button();
-            this.btHash = new System.Windows.Forms.Button();
             this.pnlStatusProc.SuspendLayout();
             this.pnlImportar.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -305,6 +305,16 @@
             this.lblGira.Text = "|";
             this.lblGira.Visible = false;
             // 
+            // btHash
+            // 
+            this.btHash.Image = global::RSADupCheck.Properties.Resources.Search;
+            this.btHash.Location = new System.Drawing.Point(586, 29);
+            this.btHash.Name = "btHash";
+            this.btHash.Size = new System.Drawing.Size(85, 60);
+            this.btHash.TabIndex = 0;
+            this.btHash.UseVisualStyleBackColor = true;
+            this.btHash.Click += new System.EventHandler(this.btHash_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.pbProcessamento);
@@ -320,7 +330,7 @@
             this.groupBox1.Controls.Add(this.txForImporting);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(528, 203);
+            this.groupBox1.Size = new System.Drawing.Size(530, 200);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Importar Pasta";
@@ -329,7 +339,7 @@
             // 
             this.pbProcessamento.Location = new System.Drawing.Point(146, 162);
             this.pbProcessamento.Name = "pbProcessamento";
-            this.pbProcessamento.Size = new System.Drawing.Size(369, 26);
+            this.pbProcessamento.Size = new System.Drawing.Size(370, 30);
             this.pbProcessamento.TabIndex = 26;
             this.pbProcessamento.Visible = false;
             // 
@@ -340,7 +350,7 @@
             this.txTagsForImport.Location = new System.Drawing.Point(146, 103);
             this.txTagsForImport.Multiline = true;
             this.txTagsForImport.Name = "txTagsForImport";
-            this.txTagsForImport.Size = new System.Drawing.Size(369, 47);
+            this.txTagsForImport.Size = new System.Drawing.Size(370, 50);
             this.txTagsForImport.TabIndex = 25;
             // 
             // label3
@@ -369,16 +379,26 @@
             this.txFileTypeForImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txFileTypeForImport.Location = new System.Drawing.Point(146, 50);
             this.txFileTypeForImport.Name = "txFileTypeForImport";
-            this.txFileTypeForImport.Size = new System.Drawing.Size(129, 20);
+            this.txFileTypeForImport.Size = new System.Drawing.Size(130, 20);
             this.txFileTypeForImport.TabIndex = 22;
             this.txFileTypeForImport.Text = "*.JPG;*.JPEG";
+            // 
+            // btImportar
+            // 
+            this.btImportar.Image = global::RSADupCheck.Properties.Resources.Database;
+            this.btImportar.Location = new System.Drawing.Point(9, 158);
+            this.btImportar.Name = "btImportar";
+            this.btImportar.Size = new System.Drawing.Size(80, 40);
+            this.btImportar.TabIndex = 15;
+            this.btImportar.UseVisualStyleBackColor = true;
+            this.btImportar.Click += new System.EventHandler(this.btImportar_Click);
             // 
             // cmbClassification
             // 
             this.cmbClassification.FormattingEnabled = true;
             this.cmbClassification.Location = new System.Drawing.Point(146, 76);
             this.cmbClassification.Name = "cmbClassification";
-            this.cmbClassification.Size = new System.Drawing.Size(369, 21);
+            this.cmbClassification.Size = new System.Drawing.Size(370, 21);
             this.cmbClassification.TabIndex = 14;
             this.cmbClassification.Text = "<<classificar>>";
             this.cmbClassification.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cmbClassification_KeyPress);
@@ -392,6 +412,16 @@
             this.label6.Size = new System.Drawing.Size(92, 15);
             this.label6.TabIndex = 13;
             this.label6.Text = "Classificação";
+            // 
+            // btFolderBrowsing
+            // 
+            this.btFolderBrowsing.Image = global::RSADupCheck.Properties.Resources.Folder;
+            this.btFolderBrowsing.Location = new System.Drawing.Point(477, 19);
+            this.btFolderBrowsing.Name = "btFolderBrowsing";
+            this.btFolderBrowsing.Size = new System.Drawing.Size(40, 30);
+            this.btFolderBrowsing.TabIndex = 2;
+            this.btFolderBrowsing.UseVisualStyleBackColor = true;
+            this.btFolderBrowsing.Click += new System.EventHandler(this.btFolderBrowsing_Click);
             // 
             // label1
             // 
@@ -411,41 +441,11 @@
             this.txForImporting.Size = new System.Drawing.Size(330, 20);
             this.txForImporting.TabIndex = 0;
             // 
-            // btImportar
-            // 
-            this.btImportar.Image = global::RSADupCheck.Properties.Resources.Database;
-            this.btImportar.Location = new System.Drawing.Point(9, 158);
-            this.btImportar.Name = "btImportar";
-            this.btImportar.Size = new System.Drawing.Size(79, 39);
-            this.btImportar.TabIndex = 15;
-            this.btImportar.UseVisualStyleBackColor = true;
-            this.btImportar.Click += new System.EventHandler(this.btImportar_Click);
-            // 
-            // btFolderBrowsing
-            // 
-            this.btFolderBrowsing.Image = global::RSADupCheck.Properties.Resources.Folder;
-            this.btFolderBrowsing.Location = new System.Drawing.Point(477, 19);
-            this.btFolderBrowsing.Name = "btFolderBrowsing";
-            this.btFolderBrowsing.Size = new System.Drawing.Size(38, 31);
-            this.btFolderBrowsing.TabIndex = 2;
-            this.btFolderBrowsing.UseVisualStyleBackColor = true;
-            this.btFolderBrowsing.Click += new System.EventHandler(this.btFolderBrowsing_Click);
-            // 
-            // btHash
-            // 
-            this.btHash.Image = global::RSADupCheck.Properties.Resources.Search;
-            this.btHash.Location = new System.Drawing.Point(586, 29);
-            this.btHash.Name = "btHash";
-            this.btHash.Size = new System.Drawing.Size(85, 60);
-            this.btHash.TabIndex = 0;
-            this.btHash.UseVisualStyleBackColor = true;
-            this.btHash.Click += new System.EventHandler(this.btHash_Click);
-            // 
             // Scan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(741, 659);
+            this.ClientSize = new System.Drawing.Size(744, 661);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.pnlImportar);
             this.Controls.Add(this.btOut);
