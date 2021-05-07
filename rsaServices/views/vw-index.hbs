@@ -1,0 +1,77 @@
+<div id="id01" class="modal">
+	<form class="modal-content animate" action="/users/login" method="POST">
+		<div class="imgcontainer">
+			<span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+			<img src="icons/img_avatar2.png" alt="Avatar" class="avatar">
+		</div>
+		<div class="container">
+			<label for="uname"><b>Username</b></label>
+			<input type="text" placeholder="Enter Username" name="email" required>
+			<label for="psw"><b>Password</b></label>
+			<input type="password" placeholder="Enter Password" name="password" required>
+			<button type="submit">Login</button>
+<!--			<label>
+				<input type="checkbox" checked="checked" name="remember"> Remember me
+			</label>-->
+		</div>
+		<div class="container" style="border-radius:10%;background-color:#f1f1f1">
+			<button type="button" onclick="justShow1();" class="cancelbtn">Cancel</button>
+			<span class="psw">
+				Não tem uma conta?<a href="#" onclick="justShow1();document.getElementById('id02').style.display='block'" >&nbsp;clique aqui.</a><br>
+				Forgot <a href="#">password?</a></span>
+		</div>
+	</form>
+</div>
+
+<div id="id02" class="modal2">
+	<span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+	<form method='POST' class="modal-content" action="/users/register">
+		<div class="container">
+			<h1>Registro</h1>
+			<p>Entre com os dados abaixo para se registrar </p>
+			<hr>
+			<label for="email"><b>Email</b></label>
+			<input type="text" placeholder="Informe o email" name="email" required>
+			<label for="username"><b>Nome de usuario</b></label>
+			<input type="text" id="inputUsername" name="username" placeholder="Informe o ID  de usuario ou email" required>
+			<label for="password"><b>Senha</b></label>
+			<input type="password" placeholder="Informe a senha" name="password" required>
+			<label for="confirmationPassword"><b>Confirme a senha</b></label>
+				<input type="password" placeholder="Confirme a senha" name="confirmationPassword" required>
+<!--			<label>
+				<input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+			</label>-->
+			<!--<p>By creating an account you agree to our <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>-->
+			<div class="container clearfix">
+				<button type="button" onclick="justShow2()" class="cancelbtn">Cancel</button>
+				<button type="submit" class="signupbtn" style="padding: 10px 18px;">Sign Up</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+
+	
+<script>
+// Get the modal
+var modal = document.getElementById('id01');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+var modal2 = document.getElementById('id02');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal2) {
+        modal2.style.display = "none";
+    }
+}
+
+</script>
+
+

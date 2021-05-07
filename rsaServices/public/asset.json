@@ -1,0 +1,175 @@
+[{
+  "_id": {
+    "$oid": "5f4d2034192273825ab4e421"
+  },
+  "ativo": "GD5920",
+  "tipoativo": "SW",
+  "descricao": "MS SQL Server",
+  "serie": "9AB67-AAAAA",
+  "tipopropriedade": "RENTAL",
+  "fabricadoem": "2020-01-01 00:00:00",
+  "localalocado": "CLIENTE02",
+  "historico": [
+    {
+      "alocadoem": "CLIENTE01",
+      "alocainicio": {
+        "$date": "2019-06-01T00:00:00Z"
+      },
+      "alocafim": {
+        "$date": "2019-10-01T00:00:00Z"
+      }
+    },
+    {
+      "alocadoem": "CLIENTE02",
+      "alocainicio": {
+        "$date": "2020-01-15T00:00:00Z"
+      },
+      "alocafim": ""
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "5f4d9f0d192273825ab4e422"
+  },
+  "ativo": "GD4920",
+  "tipoativo": "SW",
+  "descricao": "MS SQL Server",
+  "serie": "9AB67-BBBBB",
+  "tipopropriedade": "RENTAL",
+  "fabricadoem": "2019-01-01 00:00:00",
+  "localalocado": "CLIENTE02",
+  "historico": [
+    {
+      "alocadoem": "CLIENTE01",
+      "alocainicio": {
+        "$date": "2019-06-01T00:00:00Z"
+      },
+      "alocafim": {
+        "$date": "2019-10-01T00:00:00Z"
+      }
+    },
+    {
+      "alocadoem": "CLIENTE02",
+      "alocainicio": {
+        "$date": "2020-01-15T00:00:00Z"
+      },
+      "alocafim": ""
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "5f4d9f0d192273825ab4e423"
+  },
+  "ativo": "AB4920",
+  "tipoativo": "HW",
+  "descricao": "MS SQL Server",
+  "serie": "AAAAA-00000",
+  "tipopropriedade": "RENTAL",
+  "fabricadoem": "2019-01-0 00:00:00",
+  "localalocado": "CLIENTE02",
+  "historico": [
+    {
+      "alocadoem": "CLIENTE01",
+      "alocainicio": {
+        "$date": "2019-06-01T00:00:00Z"
+      },
+      "alocafim": {
+        "$date": "2019-10-01T00:00:00Z"
+      }
+    },
+    {
+      "alocadoem": "CLIENTE02",
+      "alocainicio": {
+        "$date": "2020-01-15T00:00:00Z"
+      },
+      "alocafim": ""
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "5f4d9f0d192273825ab4e424"
+  },
+  "ativo": "EF4567",
+  "tipoativo": "SW",
+  "descricao": "MS SQL Server",
+  "serie": "9AB67-CCCCC",
+  "tipopropriedade": "RENTAL",
+  "fabricadoem": "2019-01-01 00:00:00",
+  "localalocado": "CLIENTE02",
+  "historico": [
+    {
+      "alocadoem": "CLIENTE01",
+      "alocainicio": {
+        "$date": "2019-06-01T00:00:00Z"
+      },
+      "alocafim": {
+        "$date": "2019-10-01T00:00:00Z"
+      }
+    },
+    {
+      "alocadoem": "CLIENTE02",
+      "alocainicio": {
+        "$date": "2020-01-15T00:00:00Z"
+      },
+      "alocafim": ""
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "5f4d9f0d192273825ab4e425"
+  },
+  "ativo": "CB7890",
+  "tipoativo": "HW",
+  "descricao": "MS SQL Server",
+  "serie": "9AB67-DDDD",
+  "tipopropriedade": "RENTAL",
+  "fabricadoem": "2019-01-01 00:00:00",
+  "localalocado": "CLIENTE02",
+  "historico": [
+    {
+      "alocadoem": "CLIENTE01",
+      "alocainicio": {
+        "$date": "2019-06-01T00:00:00Z"
+      },
+      "alocafim": {
+        "$date": "2019-10-01T00:00:00Z"
+      }
+    },
+    {
+      "alocadoem": "CLIENTE02",
+      "alocainicio": {
+        "$date": "2020-01-15T00:00:00Z"
+      },
+      "alocafim": ""
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "5f4d9f0d192273825ab4e426"
+  },
+  "ativo": "DF7532",
+  "tipoativo": "SW",
+  "descricao": "MS SQL Server",
+  "serie": "9AB67-EEEEE",
+  "tipopropriedade": "RENTAL",
+  "fabricadoem": "2019-01-01 00:00:00",
+  "localalocado": "CLIENTE02",
+  "historico": [
+    {
+      "alocadoem": "CLIENTE01",
+      "alocainicio": {
+        "$date": "2019-06-01T00:00:00Z"
+      },
+      "alocafim": {
+        "$date": "2019-10-01T00:00:00Z"
+      }
+    },
+    {
+      "alocadoem": "CLIENTE02",
+      "alocainicio": {
+        "$date": "2020-01-15T00:00:00Z"
+      },
+      "alocafim": ""
+    }
+  ]
+}]

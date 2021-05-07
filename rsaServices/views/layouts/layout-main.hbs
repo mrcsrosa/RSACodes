@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>IT Services Management</title>
+		<link rel="stylesheet" href="/rsastyles.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<script type="text/javascript"  src="/scripts/randr.js"></script>
+	</head>
+	<body onload='startnav();'>
+			{{> navbar}}
+			{{{body}}}
+		<footer style="position:absolute;bottom:1%;width:100%;height:30px;background:#6cf;padding-left:10px;">
+			<p>Status: {{{res.locals.sucess_messages}}}</p>
+		</footer>
+	</body>
+</html>

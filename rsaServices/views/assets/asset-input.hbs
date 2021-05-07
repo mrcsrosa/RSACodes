@@ -1,0 +1,137 @@
+<!--<form method="post" onfocus="return selectLista();" onsubmit="return pageUpdate();">-->
+	<table>
+		<tr>
+			<td>
+				<label for="ativo">Ativo</label>
+			</td>
+			<td>
+				<input type="text" id="ativo" name="ativo" placeholder="Identificador do ativo" autofocus></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="tipoativo">Tipo:</label>
+			</td>
+			<td>
+				<select name="tipoativo" id="tipoativo">
+					<option value="HW">Hardware</option>
+					<option value="SW">Software</option>
+					<option value="ACY">Acessórios</option>
+					<option value="SVC">Servico</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="propriedade">Propriedade:</label>
+			</td>
+			<td>
+				<select name="propriedade" id="propriedade">
+					<option value="PROPRIO">Proprio</option>
+					<option value="RENTAL">Aluguel</option>
+					<option value="LEASING">Leasing</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="descricao"   >Descrição</label>
+			</td>
+			<td>
+				<input type="text" id="descricao" name="descricao" placeholder="Descricao do ativo" autofocus></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="serie"   >Serie</label>
+			</td>
+			<td>
+				<input type="text" id="serie" name="serie" placeholder="Numero de serie do ativo" autofocus></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="fabricao">Data de fabricação</label>
+			</td>
+			<td>
+				<input type="text" id="fabricacao" name="fabricacao" placeholder="Data de fabricacao" autofocus></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="alocado">Local de alocação</label>
+			</td>
+			<td>
+				<input type="text" id="alocado" name="alocado" placeholder="Local de alocação" autofocus></input>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><button onclick="return enableEdit();" id="btUpdate" name="btUpdate" value="UPDATE">UPDATE</button></td>
+			<td></td>
+			<td><button type="submit" name="btNew" value="NOVO">NOVO</button></td>
+			<td></td>
+		</tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		<tr>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	{{#if showAssetDetails }}
+		{{#with showAssetDetails}}
+			<script>
+				document.getElementById("ativo").value = "{{ativo}}"
+				document.getElementById("ativo").disabled = true
+				document.getElementById("tipoativo").value = "{{tipoativo}}"
+				document.getElementById("tipoativo").disabled = true
+				document.getElementById("propriedade").value = "{{tipopropriedade}}"
+				document.getElementById("propriedade").disabled = true
+				document.getElementById("descricao").value = "{{descricao}}"
+				document.getElementById("descricao").disabled = true
+				document.getElementById("serie").value = "{{serie}}"
+				document.getElementById("serie").disabled = true
+				document.getElementById("fabricacao").disabled = true
+				document.getElementById("fabricacao").value = "{{fabricadoem}}"
+				document.getElementById("alocado").disabled = true
+				document.getElementById("alocado").value = "{{localalocado}}"
+				function pageUpdate() {
+					alert('Lendo a pagina')
+				}
+
+				function selectLista() {
+					alert('Mudou a lista')
+				}
+
+				function enableEdit() {
+					b = document.getElementById("btUpdate")
+					if ( b.value === "STEP1")
+					{
+						b.value = "STEP2"
+						return
+					}
+					document.getElementById("ativo").disabled = false
+					document.getElementById("tipoativo").disabled = false
+					document.getElementById("propriedade").disabled = false
+					document.getElementById("descricao").disabled = false
+					document.getElementById("serie").disabled = false
+					document.getElementById("fabricacao").disabled = false
+					document.getElementById("alocado").disabled = false
+					document.getElementById("btUpdate").innerText = "SAVE"
+					b.value =  "STEP1" 
+				}
+			</script>
+		{{/with}}
+	{{/if}}
+<!--</form>-->

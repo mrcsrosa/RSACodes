@@ -1,0 +1,57 @@
+<!-- Just a commnet -->
+<script  nonce type='text/javascript' src='scripts/clt-asset.js'></script>
+<form  id='myframe' method='POST' action='/assets/entrada'>
+	<div id='assetsChoice' class='containerchoice'>
+		<div id="labelAtivos" style="position:relative; top: -15px; left: -10px; width: 410px;">
+			<p style="text-align:center;font-weight:bolder;">ATIVOS</p>
+		</div>
+	</div >
+		<div id="assetDetails" class="container">
+			<label for="fldativo"><b>ATIVO</b></label><br/>
+			<input type="text" id="ativo" class='fieldsAsset' name="fldativo" maxlenght=8 size=8 placeholder="Identificador do ativo" autofocus>
+				<div class='pencil-asset-edit'>
+					<img id='pencil-asset-edit' src='icons/pencil-edit-button.png' onclick='setStateAsset(false);setSubmitState(false);setNewState(true);'></img>
+				</div>
+			</input>
+			<br/>
+			<div id="lblTipo" style="width:200px;position:relative; top: 5px; left: 0px;">
+				<label for="tipoativo"><b>TIPO</b></label><br>
+				<select name="fldtipoativo" id="tipoativo" class='fieldsAsset'>
+					<option value="HW">Hardware</option>
+					<option value="SW">Software</option>
+					<option value="ACY">Acessórios</option>
+					<option value="SVC">Servico</option>
+				</select>
+			</div>
+			<div id="lblPropriedade" style="width:150px;position:relative; top: -35px; left: 200px;">
+				<label for="propriedade"><b>PROPRIEDADE</b></label><br>
+				<select name="fldpropriedade" id="propriedade" class='fieldsAsset'>
+					<option value="PROPRIO">Proprio</option>
+					<option value="RENTAL">Aluguel</option>
+					<option value="LEASING">Leasing</option>
+				</select>
+			</div>
+			<div id="lblDescricao" style="position:relative; top: -30px; left: 0px;">
+				<label for="descricao"><b>DESCRIÇÃO</b></label><br>
+				<input type="text" id="descricao" maxlength=60 size=60 name='flddescricao' class='fieldsAsset' placeholder="Descricao do ativo" autofocus>
+				</input>
+			</div>
+			<div id="lblserie" style="width:250px;position:relative; top: -10px; left: 0px;">
+				<label for="serie"><b>SÉRIE</b></label><br>	
+				<input type="text" id="serie" name="fldserie" class='fieldsAsset' placeholder="Numero de serie do ativo" autofocus></input>		
+			</div>
+			<div id="lblfabricacao" style="position:relative; top: -50px; left: 200px; width: 250px;">
+				<label for="fabricao"><b>DATA DE FABRICAÇÃO</b></label>
+				<input type="date" id="fabricacao" name="fldfabricacao" class='fieldsAsset' placeholder="Data de fabricacao" autofocus></input><br>
+			</div>
+			<div id="lbllocalaloc" style="position:relative;top: -20px;left:0px;">
+				<label for="alocado"><b>LOCAL DE ALOCAÇÃO</b></label><br>
+				<input type="text" id="alocado" name="fldalocado" class='fieldsAsset' placeholder="Local de alocação" autofocus></input><br><br>
+			</div>
+				<button id='btUpdate' type='submit'  name='btUpdate' value='UPDATE' onclick='return prepareUpdate(this);'>SAVE</button>
+				<button id='btNew'  type='reset' name='btNew' value='NOVO' onclick='return prepareInsert();'>NOVO</button>
+		</div>
+</form>
+<script type='text/javascript'>
+	start();
+</script>

@@ -1,0 +1,24 @@
+<div class="mobile-container">
+	<div class="topnav">
+		<a href="/" class="active">ITSM Net</a>
+		<div id="myMenu">
+		</div>
+		<a href="javascript:void(0);" class="icon" onclick="showInOut()">
+			<i class="fa fa-bars"></i>
+		</a>
+	</div>
+	<div style="padding-left:16px">
+	{{mensagem}}
+	</div>
+</div>
+<script>
+	function showInOut() {
+		var x = document.getElementById("myMenu");
+		if (x.style.display === "block") {
+			x.style.display = "none";
+		}
+		else {
+			x.style.display = "block";
+		}
+	}
+</script>
